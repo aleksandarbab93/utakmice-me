@@ -4,6 +4,68 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+    --color-bg: #07080A;
+    --color-surface: #12151A;
+    --color-surface-2: #0D1014;
+    --color-panel: #1A1F26;
+    --color-panel-2: #14181E;
+
+    --color-text: #F2F4F7;
+    --color-text-2: #C8CFD8;
+    --color-text-muted: #98A1AE;
+    --color-text-dim: #6B7480;
+
+    --color-brand: #F2F4F7;
+
+    --color-accent-football: #C6E64B;
+    --color-accent-basketball: #FF6A2B;
+
+    --color-live: #F2453D;
+    --color-live-text: #FF7A73;
+    --color-positive: #3FCF8E;
+    --color-negative: #F2453D;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+}
+
+.link-hover:hover {
+    color: var(--color-accent-football);
+}
+
+@keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .25; }
+}
+
+.animate-live {
+    animation: livePulse 1.6s infinite;
+}
+
+.img-placeholder {
+    background-image: repeating-linear-gradient(135deg, var(--color-panel) 0 8px, var(--color-panel-2) 8px 16px);
+}
+
+.scrollrow {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.scrollrow::-webkit-scrollbar {
+    display: none;
+}
+
+@media (hover: hover) {
+    .card-hover:hover {
+        background-color: #171B21;
+    }
 }

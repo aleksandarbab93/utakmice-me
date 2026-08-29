@@ -9,8 +9,13 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
             fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
+                bunny('Archivo', {
+                    weights: [400, 500, 600, 700, 800],
+                    subsets: ['latin', 'latin-ext'],
+                }),
+                bunny('JetBrains Mono', {
+                    weights: [400, 500, 700],
+                    subsets: ['latin', 'latin-ext'],
                 }),
             ],
         }),

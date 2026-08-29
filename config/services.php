@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'sstats' => [
+        'key' => env('SSTATS_API_KEY'),
+        'base_url' => env('SSTATS_BASE_URL', 'https://api.sstats.net'),
+    ],
+
 ];
