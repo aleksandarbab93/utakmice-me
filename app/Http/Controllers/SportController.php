@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Support\Accent;
 use App\Support\FootballFeed;
+use App\Support\PostFeed;
 use App\Support\SampleData;
 use App\Support\TeamBadge;
 use Illuminate\Http\Request;
@@ -22,11 +23,11 @@ class SportController extends Controller
         }
 
         $liveTabs = $sport === 'fudbal' ? FootballFeed::homeLive() : SampleData::homeLive($sport);
-        $posts = SampleData::posts($sport);
+        $posts = $sport === 'fudbal' ? PostFeed::posts($sport)->all() : SampleData::posts($sport);
         $hero = array_shift($posts);
         $secondary = array_splice($posts, 0, 2);
         $latest = collect($posts)->take(4);
-        $mostRead = collect(array_merge([$hero], $secondary))->take(3)->values();
+        $mostRead = collect(array_merge([$hero], $secondary))->filter()->take(3)->values();
         $standings = $sport === 'fudbal' ? FootballFeed::standings() : SampleData::standings($sport);
 
         return view('home', [

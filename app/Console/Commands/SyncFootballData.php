@@ -7,6 +7,7 @@ use App\Models\League;
 use App\Models\Standing;
 use App\Models\Team;
 use App\Services\SStats\SStatsClient;
+use App\Support\MatchReportGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -40,6 +41,7 @@ class SyncFootballData extends Command
 
             try {
                 $this->syncFixtures($client, $league, $externalId, $year);
+                sleep(1);
                 $this->syncStandings($client, $league, $externalId, $year);
             } catch (\Throwable $e) {
                 $this->error("  {$name}: {$e->getMessage()}");
@@ -62,12 +64,13 @@ class SyncFootballData extends Command
     private function syncFixtures(SStatsClient $client, League $league, int $externalLeagueId, int $year): void
     {
         $games = $client->fixtures($externalLeagueId, $year);
+        $reportsGenerated = 0;
 
         foreach ($games as $game) {
             $home = $this->upsertTeam($league, $game['homeTeam']);
             $away = $this->upsertTeam($league, $game['awayTeam']);
 
-            Fixture::updateOrCreate(
+            $fixture = Fixture::updateOrCreate(
                 ['external_source' => 'sstats', 'external_id' => (string) $game['id']],
                 [
                     'league_id' => $league->id,
@@ -81,9 +84,14 @@ class SyncFootballData extends Command
                     'matchday' => $game['roundName'] ?? null,
                 ],
             );
+
+            if (MatchReportGenerator::generate($fixture, $client)) {
+                $reportsGenerated++;
+                usleep(400000); // the extra per-match detail call adds to the shared rate limit budget
+            }
         }
 
-        $this->line('  fixtures: '.count($games).' rows');
+        $this->line('  fixtures: '.count($games).' rows'.($reportsGenerated ? ", {$reportsGenerated} new reports" : ''));
     }
 
     private function syncStandings(SStatsClient $client, League $league, int $externalLeagueId, int $year): void

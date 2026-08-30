@@ -12,7 +12,7 @@
                                 <span>{{ \App\Support\Accent::leagueFlag($league['name']) }}</span>
                                 <span class="truncate">{{ $league['name'] }}</span>
                             </a>
-                            <a href="{{ route('standings', ['sport' => $sport, 'liga' => $league['slug']]) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela</a>
+                            <a href="{{ \App\Support\Nav::standings($sport, $league['slug']) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela</a>
                         </div>
                     @endforeach
                 </div>
@@ -27,11 +27,11 @@
                         <button data-tab="favorizovani" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">FAVORIZOVANI</button>
                     </div>
                     <div class="flex items-center gap-2">
-                        <a href="{{ route('scores', ['sport' => $sport, 'date' => $prevDate]) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted" style="width:34px;height:34px">
+                        <a href="{{ \App\Support\Nav::scores($sport, $prevDate) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted" style="width:34px;height:34px">
                             <x-icon name="back" class="w-3.5 h-3.5" />
                         </a>
                         <span class="font-mono text-[12px] font-bold tracking-[0.08em] px-2 min-w-[90px] text-center">{{ $dateLabel }}</span>
-                        <a href="{{ route('scores', ['sport' => $sport, 'date' => $nextDate]) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted rotate-180" style="width:34px;height:34px">
+                        <a href="{{ \App\Support\Nav::scores($sport, $nextDate) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted rotate-180" style="width:34px;height:34px">
                             <x-icon name="back" class="w-3.5 h-3.5" />
                         </a>
                     </div>
@@ -48,7 +48,7 @@
                                     <span class="font-mono text-[10px] font-bold tracking-[0.16em] text-text-2 truncate">{{ strtoupper($group['name']) }}</span>
                                     <svg data-chevron width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-text-dim transition-transform"><path d="M6 9l6 6 6-6"/></svg>
                                 </button>
-                                <a href="{{ route('standings', ['sport' => $sport, 'liga' => $group['slug']]) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela &rsaquo;</a>
+                                <a href="{{ \App\Support\Nav::standings($sport, $group['slug']) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela &rsaquo;</a>
                             </div>
                             <div data-league-body class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
                                 @foreach ($group['matches'] as $m)
@@ -59,7 +59,7 @@
                                     @php
                                         $scoreColor = $m['status'] === 'live' ? 'text-live-text' : '';
                                     @endphp
-                                    <div data-match-row data-match-id="{{ $m['id'] }}" data-status="{{ $m['status'] }}" class="flex items-center gap-3 px-3.5 py-3 border-b border-white/[0.05] last:border-0">
+                                    <a href="{{ \App\Support\Nav::match($m['id']) }}" data-match-row data-match-id="{{ $m['id'] }}" data-status="{{ $m['status'] }}" class="flex items-center gap-3 px-3.5 py-3 border-b border-white/[0.05] last:border-0 hover:bg-white/[0.02]">
                                         <button data-fav-star="{{ $m['id'] }}" class="flex-none w-5 h-5 flex items-center justify-center text-text-dim" aria-label="Favorizuj">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg>
                                         </button>
@@ -103,7 +103,7 @@
                                                 <span class="font-mono text-sm font-bold {{ $scoreColor }} {{ $homeWins ? 'text-text-muted' : '' }}">{{ $m['away_score'] }}</span>
                                             </div>
                                         @endif
-                                    </div>
+                                    </a>
                                 @endforeach
                             </div>
                         </div>
@@ -138,7 +138,9 @@
             document.querySelectorAll('[data-fav-star]').forEach((btn) => {
                 const id = btn.dataset.favStar;
                 paintStar(btn, favs.has(id));
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     if (favs.has(id)) { favs.delete(id); } else { favs.add(id); }
                     setFavs([...favs]);
                     paintStar(btn, favs.has(id));

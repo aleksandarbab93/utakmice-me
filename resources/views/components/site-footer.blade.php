@@ -8,7 +8,7 @@
                 <div class="flex items-center gap-2.5">
                     <x-logo size="md" />
                 </div>
-                <p class="text-sm leading-relaxed text-text-muted max-w-[34ch]">Rezultati, tabele i vesti iz liga petice i evropske košarke. Uživo, bez čekanja na osvežavanje strane.</p>
+                <p class="text-sm leading-relaxed text-text-muted max-w-[34ch]">Rezultati, tabele i vijesti iz liga petice i evropske košarke. Uživo, bez čekanja na osvežavanje strane.</p>
                 <span class="w-9.5 h-9.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center" style="width:38px;height:38px">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8CFD8" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="#C8CFD8" stroke="none"/></svg>
                 </span>
@@ -17,23 +17,23 @@
             <div class="flex flex-col gap-3">
                 <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">FUDBAL</span>
                 @foreach (\App\Support\Accent::leagues('fudbal') as $league)
-                    <a href="{{ route('home', 'fudbal') }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
+                    <a href="{{ \App\Support\Nav::home('fudbal') }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
                 @endforeach
             </div>
 
             <div class="flex flex-col gap-3">
                 <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">KOŠARKA</span>
                 @foreach (\App\Support\Accent::leagues('kosarka') as $league)
-                    <a href="{{ route('home', 'kosarka') }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
+                    <a href="{{ \App\Support\Nav::home('kosarka') }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
                 @endforeach
-                <a href="{{ route('standings', 'kosarka') }}" class="text-[13.5px] text-text-2">Tabele takmičenja</a>
+                <a href="{{ \App\Support\Nav::standings('kosarka') }}" class="text-[13.5px] text-text-2">Tabele takmičenja</a>
             </div>
 
             <div class="flex flex-col gap-3">
                 <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">SEKCIJE</span>
-                <a href="{{ route('scores', $sport) }}" class="text-[13.5px] text-text-2">Rezultati</a>
-                <a href="{{ route('standings', $sport) }}" class="text-[13.5px] text-text-2">Tabele</a>
-                <a href="{{ route('home', $sport) }}" class="text-[13.5px] text-text-2">Vesti</a>
+                <a href="{{ \App\Support\Nav::scores($sport) }}" class="text-[13.5px] text-text-2">Utakmice</a>
+                <a href="{{ \App\Support\Nav::standings($sport) }}" class="text-[13.5px] text-text-2">Tabele</a>
+                <a href="{{ \App\Support\Nav::home($sport) }}" class="text-[13.5px] text-text-2">Vijesti</a>
                 <span class="text-[13.5px] text-text-2">Prenosi</span>
                 <span class="text-[13.5px] text-text-2">Statistika</span>
             </div>
@@ -66,22 +66,22 @@
             <div class="flex items-center gap-2">
                 <x-logo />
             </div>
-            <p class="text-[13.5px] leading-relaxed text-text-muted">Rezultati, tabele i vesti iz liga petice i evropske košarke.</p>
+            <p class="text-[13.5px] leading-relaxed text-text-muted">Rezultati, tabele i vijesti iz liga petice i evropske košarke.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-5">
             <div class="flex flex-col gap-2.5">
                 <span class="font-mono text-[9px] font-bold tracking-[0.16em] text-text-dim">FUDBAL</span>
                 @foreach (\App\Support\Accent::leagues('fudbal') as $league)
-                    <a href="{{ route('home', 'fudbal') }}" class="text-[13px] text-text-2">{{ $league }}</a>
+                    <a href="{{ \App\Support\Nav::home('fudbal') }}" class="text-[13px] text-text-2">{{ $league }}</a>
                 @endforeach
             </div>
             <div class="flex flex-col gap-2.5">
                 <span class="font-mono text-[9px] font-bold tracking-[0.16em] text-text-dim">KOŠARKA</span>
                 @foreach (\App\Support\Accent::leagues('kosarka') as $league)
-                    <a href="{{ route('home', 'kosarka') }}" class="text-[13px] text-text-2">{{ $league }}</a>
+                    <a href="{{ \App\Support\Nav::home('kosarka') }}" class="text-[13px] text-text-2">{{ $league }}</a>
                 @endforeach
-                <a href="{{ route('standings', 'kosarka') }}" class="text-[13px] text-text-2">Tabele</a>
+                <a href="{{ \App\Support\Nav::standings('kosarka') }}" class="text-[13px] text-text-2">Tabele</a>
             </div>
         </div>
 

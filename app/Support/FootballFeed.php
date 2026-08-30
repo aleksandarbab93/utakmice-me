@@ -95,6 +95,7 @@ class FootballFeed
         $sutra = (clone $base)->whereDate('kickoff_at', Carbon::tomorrow())->orderBy('kickoff_at')->get();
 
         $map = fn (Fixture $f) => [
+            'id' => $f->id,
             'league' => strtoupper($f->league->name),
             'status' => $f->status === 'live' ? ($f->minute ? $f->minute."'" : 'UŽIVO') : $f->kickoff_at->format('H:i'),
             'live' => $f->status === 'live',

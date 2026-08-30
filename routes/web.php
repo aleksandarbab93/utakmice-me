@@ -1,22 +1,46 @@
 <?php
 
+use App\Http\Controllers\MatchController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SportController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/fudbal');
+// Fudbal lives at the site root — no /fudbal prefix.
+Route::get('/', [SportController::class, 'home'])
+    ->defaults('sport', 'fudbal')
+    ->name('home.fudbal');
 
-Route::get('/{sport}', [SportController::class, 'home'])
-    ->where('sport', 'fudbal|kosarka')
-    ->name('home');
+Route::get('/utakmice', [SportController::class, 'scores'])
+    ->defaults('sport', 'fudbal')
+    ->name('scores.fudbal');
 
-Route::get('/{sport}/rezultati', [SportController::class, 'scores'])
-    ->where('sport', 'fudbal|kosarka')
-    ->name('scores');
+Route::get('/tabele', [SportController::class, 'standings'])
+    ->defaults('sport', 'fudbal')
+    ->name('standings.fudbal');
 
-Route::get('/{sport}/tabele', [SportController::class, 'standings'])
-    ->where('sport', 'fudbal|kosarka')
-    ->name('standings');
+// Košarka keeps its /kosarka prefix.
+Route::get('/kosarka', [SportController::class, 'home'])
+    ->defaults('sport', 'kosarka')
+    ->name('home.kosarka');
 
-Route::get('/vesti/{slug}', [PostController::class, 'show'])
+Route::get('/kosarka/utakmice', [SportController::class, 'scores'])
+    ->defaults('sport', 'kosarka')
+    ->name('scores.kosarka');
+
+Route::get('/kosarka/tabele', [SportController::class, 'standings'])
+    ->defaults('sport', 'kosarka')
+    ->name('standings.kosarka');
+
+Route::get('/vijesti/{slug}', [PostController::class, 'show'])
     ->name('post.show');
+
+Route::get('/mec/{fixture}', [MatchController::class, 'show'])
+    ->name('match.show');
+
+// Old URLs redirect to the new root-based scheme.
+Route::redirect('/fudbal', '/');
+Route::redirect('/fudbal/rezultati', '/utakmice');
+Route::redirect('/fudbal/tabele', '/tabele');
+Route::redirect('/rezultati', '/utakmice');
+Route::redirect('/kosarka/rezultati', '/kosarka/utakmice');
+Route::get('/vesti/{slug}', fn (string $slug) => redirect("/vijesti/{$slug}"));

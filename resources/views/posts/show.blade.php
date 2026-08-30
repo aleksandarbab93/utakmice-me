@@ -1,5 +1,6 @@
 @php
     $match = $post['match'] ?? null;
+    $matchIsLive = $match && $match['status'] === 'live';
     $author = $post['author'] ?? 'Redakcija';
 @endphp
 
@@ -9,7 +10,7 @@
     <div class="lg:hidden flex flex-col min-h-screen">
         <div class="h-14 flex items-center justify-between px-4 border-b border-white/[0.07]">
             <div class="flex items-center gap-3">
-                <a href="{{ route('home', $sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
+                <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
                     <x-icon name="back" class="w-3.5 h-3.5" />
                 </a>
                 <span class="font-mono text-[10px] tracking-[0.14em] {{ $accent['text'] }}">{{ strtoupper($post['league']) }}</span>
@@ -20,10 +21,7 @@
             </div>
         </div>
 
-        <div class="flex-1 {{ $match ? 'pb-20' : '' }}">
-            <div class="h-52 img-placeholder flex items-end p-3" style="height:210px">
-                <span class="font-mono text-[9.5px] tracking-[0.12em] text-text-dim">GLAVNA FOTO 16:9 &middot; POTPIS FOTOGRAFIJE</span>
-            </div>
+        <div class="flex-1 {{ $matchIsLive ? 'pb-20' : '' }}">
             <div class="px-4 py-4.5 flex flex-col gap-3.5">
                 <h1 class="text-[26px] font-extrabold leading-tight tracking-tight text-balance">{{ $post['title'] }}</h1>
                 <p class="text-base leading-relaxed text-text-2">{{ $post['lead'] }}</p>
@@ -65,7 +63,7 @@
             </div>
         </div>
 
-        @if ($match)
+        @if ($matchIsLive)
             <div class="h-16 border-t border-white/[0.07] bg-[#0A0C0F] flex items-center gap-2.5 px-4 fixed bottom-0 inset-x-0 z-10">
                 <div class="flex-1 h-11 rounded-full flex items-center justify-center {{ $accent['tint'] }} border {{ $accent['tintBorder'] }} {{ $accent['text'] }} text-sm font-bold">Prati meč uživo</div>
                 <button class="w-11 h-11 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted"><x-icon name="share" class="w-4 h-4" /></button>
@@ -95,10 +93,6 @@
                         <span class="h-8 px-3.5 rounded-full bg-surface border border-white/[0.08] flex items-center text-text-muted text-[12.5px]">Podeli</span>
                         <span class="h-8 px-3.5 rounded-full bg-surface border border-white/[0.08] flex items-center text-text-muted text-[12.5px]">Sačuvaj</span>
                     </div>
-                </div>
-
-                <div class="h-80 rounded-2xl img-placeholder flex items-end p-3.5" style="height:320px">
-                    <span class="font-mono text-[10px] tracking-[0.12em] text-text-dim">GLAVNA FOTO 16:9 &middot; POTPIS FOTOGRAFIJE</span>
                 </div>
 
                 @foreach ($post['body'] as $paragraph)
@@ -134,15 +128,14 @@
                         <div class="p-3.5 flex flex-col gap-2.5">
                             <div class="flex justify-between"><span class="text-[14.5px] font-bold">{{ $match['home'] }}</span><span class="font-mono text-base font-bold">{{ $match['home_score'] }}</span></div>
                             <div class="flex justify-between text-text-muted"><span class="text-[14.5px]">{{ $match['away'] }}</span><span class="font-mono text-base font-bold">{{ $match['away_score'] }}</span></div>
-                            <div class="h-9.5 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-[13px] font-bold" style="height:38px">Tok meča</div>
+                            <a href="{{ \App\Support\Nav::match($match['id']) }}" class="h-9.5 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-[13px] font-bold" style="height:38px">Tok meča</a>
                         </div>
                     </div>
                 @endif
                 <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
                     <div class="px-3.5 py-3 border-b border-white/[0.07] font-mono text-[10px] font-bold tracking-[0.14em] text-text-2">POVEZANO</div>
                     @foreach ($related as $rp)
-                        <a href="{{ route('post.show', $rp['slug']) }}" class="flex gap-2.5 px-3.5 py-3 {{ !$loop->last ? 'border-b border-white/[0.05]' : '' }}">
-                            <span class="flex-none w-14 h-11 rounded-lg img-placeholder" style="width:56px;height:44px"></span>
+                        <a href="{{ route('post.show', $rp['slug']) }}" class="flex px-3.5 py-3 {{ !$loop->last ? 'border-b border-white/[0.05]' : '' }}">
                             <span class="text-[13px] font-semibold leading-snug">{{ $rp['title'] }}</span>
                         </a>
                     @endforeach

@@ -2,7 +2,7 @@
     <div class="max-w-md mx-auto lg:py-6">
         <div class="px-4 lg:px-0 pt-3 pb-1 flex gap-2 scrollrow">
             @foreach ($standings['competitions'] as $competition)
-                <a href="{{ route('standings', ['sport' => $sport, 'liga' => \Illuminate\Support\Str::slug($competition)]) }}"
+                <a href="{{ \App\Support\Nav::standings($sport, \Illuminate\Support\Str::slug($competition)) }}"
                    class="flex-none h-8 px-3.5 rounded-full flex items-center text-[12.5px] {{ $competition === $standings['competition'] ? 'bg-white/[0.1] font-semibold' : 'bg-surface border border-white/[0.08] text-text-2' }}">{{ $competition }}</a>
             @endforeach
         </div>

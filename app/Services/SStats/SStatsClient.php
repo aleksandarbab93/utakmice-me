@@ -33,6 +33,12 @@ class SStatsClient
         return $data['tables'][0]['rows'] ?? [];
     }
 
+    /** Full match detail — events (goals/cards/subs), statistics, venue, referee. */
+    public function gameDetail(int $gameId): ?array
+    {
+        return $this->get("/games/{$gameId}")['data'] ?? null;
+    }
+
     private function get(string $path, array $query = []): array
     {
         if ($this->apiKey) {
