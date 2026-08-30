@@ -16,7 +16,24 @@ use Illuminate\Support\Collection;
  */
 class FootballFeed
 {
-    private const DAY_ABBR = [1 => 'PON', 2 => 'UTO', 3 => 'SRE', 4 => 'ČET', 5 => 'PET', 6 => 'SUB', 7 => 'NED'];
+    public const DAY_ABBR = [1 => 'PON', 2 => 'UTO', 3 => 'SRE', 4 => 'ČET', 5 => 'PET', 6 => 'SUB', 7 => 'NED'];
+
+    public static function dayLabel(Carbon $date): string
+    {
+        if ($date->isToday()) {
+            return 'DANAS';
+        }
+
+        if ($date->isTomorrow()) {
+            return 'SUTRA';
+        }
+
+        if ($date->isYesterday()) {
+            return 'JUČE';
+        }
+
+        return self::DAY_ABBR[$date->isoWeekday()].' '.$date->format('d.m.');
+    }
 
     public static function leagues(): Collection
     {
@@ -27,20 +44,44 @@ class FootballFeed
             ->filter();
     }
 
-    /** Today's fixtures across all five leagues, grouped by league name — for the Rezultati page. */
-    public static function todaysMatchesGrouped(): Collection
+    /**
+     * Fixtures for one calendar day across all five leagues, grouped by
+     * league with sidebar/header metadata attached — for the Rezultati page.
+     */
+    public static function matchesForDate(Carbon $date): Collection
     {
-        $leagueIds = self::leagues()->pluck('id');
+        $leagues = self::leagues();
 
-        $fixtures = Fixture::whereIn('league_id', $leagueIds)
-            ->whereDate('kickoff_at', Carbon::today())
+        $fixtures = Fixture::whereIn('league_id', $leagues->pluck('id'))
+            ->whereDate('kickoff_at', $date)
             ->with(['homeTeam', 'awayTeam', 'league'])
             ->orderBy('kickoff_at')
-            ->get();
+            ->get()
+            ->groupBy('league_id');
 
-        return $fixtures
-            ->map(fn (Fixture $f) => self::mapMatch($f))
-            ->groupBy('league');
+        return $leagues->map(function (League $league) use ($fixtures) {
+            $matches = ($fixtures->get($league->id) ?? collect())
+                ->map(fn (Fixture $f) => [
+                    'id' => $f->id,
+                    'home' => $f->homeTeam->name,
+                    'homeInitials' => TeamBadge::initials($f->homeTeam->name),
+                    'away' => $f->awayTeam->name,
+                    'awayInitials' => TeamBadge::initials($f->awayTeam->name),
+                    'status' => $f->status,
+                    'home_score' => $f->home_score,
+                    'away_score' => $f->away_score,
+                    'minute' => $f->status === 'live' && $f->minute ? $f->minute."'" : null,
+                    'kickoff' => $f->kickoff_at->format('H:i'),
+                ])
+                ->values();
+
+            return [
+                'name' => $league->name,
+                'slug' => $league->slug,
+                'flag' => Accent::leagueFlag($league->name),
+                'matches' => $matches,
+            ];
+        })->filter(fn ($group) => $group['matches']->isNotEmpty())->values();
     }
 
     /** Uživo / Danas / Sutra buckets for the home page widget. */
@@ -103,20 +144,6 @@ class FootballFeed
                 'label' => $next->homeTeam->name.' — '.$next->awayTeam->name,
                 'when' => self::DAY_ABBR[$next->kickoff_at->isoWeekday()].' '.$next->kickoff_at->format('H:i'),
             ] : null,
-        ];
-    }
-
-    private static function mapMatch(Fixture $f): array
-    {
-        return [
-            'league' => $f->league->name,
-            'home' => $f->homeTeam->name,
-            'away' => $f->awayTeam->name,
-            'status' => $f->status,
-            'home_score' => $f->home_score,
-            'away_score' => $f->away_score,
-            'minute' => $f->status === 'live' && $f->minute ? $f->minute."'" : null,
-            'kickoff' => $f->kickoff_at->format('H:i'),
         ];
     }
 }

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Support\Accent;
 use App\Support\FootballFeed;
 use App\Support\SampleData;
+use App\Support\TeamBadge;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class SportController extends Controller
@@ -47,17 +49,45 @@ class SportController extends Controller
     {
         $this->validateSport($sport);
 
+        $date = $request->query('date')
+            ? Carbon::createFromFormat('Y-m-d', $request->query('date'))
+            : Carbon::today();
+
         if ($sport === 'fudbal') {
-            $grouped = FootballFeed::todaysMatchesGrouped();
+            $groups = FootballFeed::matchesForDate($date);
         } else {
-            $grouped = collect(SampleData::matches($sport))->groupBy('league');
+            $groups = collect(SampleData::matches($sport))
+                ->groupBy('league')
+                ->map(fn ($matches, $name) => [
+                    'name' => $name,
+                    'slug' => Str::slug($name),
+                    'flag' => Accent::leagueFlag($name),
+                    'matches' => collect($matches)->map(fn ($m, $i) => [
+                        'id' => $name.'-'.$i,
+                        'home' => $m['home'],
+                        'homeInitials' => TeamBadge::initials($m['home']),
+                        'away' => $m['away'],
+                        'awayInitials' => TeamBadge::initials($m['away']),
+                        'status' => $m['status'],
+                        'home_score' => $m['home_score'] ?? null,
+                        'away_score' => $m['away_score'] ?? null,
+                        'minute' => $m['minute'] ?? ($m['period'] ?? null),
+                        'kickoff' => $m['kickoff'] ?? null,
+                    ])->values(),
+                ])
+                ->values();
         }
 
         return view('scores', [
             'sport' => $sport,
             'accent' => Accent::classes($sport),
             'active' => 'scores',
-            'grouped' => $grouped,
+            'groups' => $groups,
+            'leagues' => collect(Accent::leagues($sport))->map(fn ($name) => ['name' => $name, 'slug' => Str::slug($name)]),
+            'date' => $date,
+            'dateLabel' => FootballFeed::dayLabel($date),
+            'prevDate' => $date->copy()->subDay()->format('Y-m-d'),
+            'nextDate' => $date->copy()->addDay()->format('Y-m-d'),
         ]);
     }
 

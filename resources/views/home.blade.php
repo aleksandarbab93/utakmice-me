@@ -2,6 +2,8 @@
     $tabClasses = fn (string $key) => $tab === $key
         ? $accent['tint'].' '.$accent['tintBorder'].' '.$accent['text']
         : 'bg-surface border-white/[0.08] text-text-muted';
+    $visibleMatches = array_slice($activeMatches, 0, 4);
+    $hasMoreMatches = count($activeMatches) > 4;
 @endphp
 
 <x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Naslovna — Utakmice.me'">
@@ -21,7 +23,7 @@
         </div>
 
         <div class="px-4 pt-3.5 flex flex-col gap-2">
-            @forelse ($activeMatches as $m)
+            @forelse ($visibleMatches as $m)
                 @php
                     $finished = ! $m['live'] && $m['hs'] !== '–';
                     $homeWins = $finished && (int) $m['hs'] > (int) $m['as'];
@@ -44,6 +46,9 @@
                     <a href="{{ route('home', ['sport' => $sport, 'tab' => 'danas']) }}" class="h-11 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-sm font-bold">Vidi današnji program</a>
                 </div>
             @endforelse
+            @if ($hasMoreMatches)
+                <a href="{{ route('scores', $sport) }}" class="h-11 rounded-full flex items-center justify-center bg-surface border border-white/[0.08] text-text-2 text-sm font-semibold">Vidi sve rezultate &rsaquo;</a>
+            @endif
         </div>
 
         <div class="px-4 pt-4.5 flex flex-col gap-3">
@@ -82,7 +87,7 @@
 
             @if (count($activeMatches) > 0)
                 <div class="grid grid-cols-4 gap-3">
-                    @foreach ($activeMatches as $m)
+                    @foreach ($visibleMatches as $m)
                         @php
                             $finished = ! $m['live'] && $m['hs'] !== '–';
                             $homeWins = $finished && (int) $m['hs'] > (int) $m['as'];
@@ -98,6 +103,9 @@
                         </a>
                     @endforeach
                 </div>
+                @if ($hasMoreMatches)
+                    <a href="{{ route('scores', $sport) }}" class="self-start h-9 px-4 rounded-full flex items-center bg-surface border border-white/[0.08] text-text-2 text-[13px] font-semibold">Vidi sve rezultate &rsaquo;</a>
+                @endif
             @else
                 <div class="border border-dashed border-white/[0.12] rounded-2xl p-5.5 flex items-center justify-between gap-5">
                     <div class="flex flex-col gap-1.5">

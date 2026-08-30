@@ -43,4 +43,18 @@ class Accent
             ? ['Evroliga', 'Evrokup']
             : ['Premijer liga', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1'];
     }
+
+    /** Flag emoji per league — used in the Rezultati league group headers. */
+    public static function leagueFlag(string $leagueName): string
+    {
+        return match ($leagueName) {
+            'Premijer liga' => '🇬🇧',
+            'La Liga' => '🇪🇸',
+            'Serie A' => '🇮🇹',
+            'Bundesliga' => '🇩🇪',
+            'Ligue 1' => '🇫🇷',
+            'Evroliga', 'Evrokup' => '🇪🇺',
+            default => '🏳️',
+        };
+    }
 }
