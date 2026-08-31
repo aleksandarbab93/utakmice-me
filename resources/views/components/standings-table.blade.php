@@ -35,9 +35,7 @@
                     <tr class="{{ !$loop->last ? 'border-b border-white/[0.05]' : '' }} {{ in_array($row['team'], $highlight, true) ? 'bg-white/[0.04]' : '' }}">
                         <td class="px-2 py-3">
                             <span class="flex items-center gap-1.5">
-                                @if (! empty($row['zone']))
-                                    <span class="w-1.5 h-1.5 rounded-full flex-none {{ $zoneDot($row['zone']) }}"></span>
-                                @endif
+                                <span class="w-1.5 h-1.5 rounded-full flex-none {{ ! empty($row['zone']) ? $zoneDot($row['zone']) : '' }}"></span>
                                 <span class="text-xs font-bold {{ $row['pos'] === 1 ? $accent['text'] : 'text-text-muted' }}">{{ $row['pos'] }}</span>
                             </span>
                         </td>
