@@ -41,10 +41,10 @@ class Accent
     {
         return $sport === 'kosarka'
             ? ['Evroliga', 'Evrokup']
-            : ['Premijer liga', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1'];
+            : ['Premijer liga', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Liga prvaka', 'Evropska liga', 'Liga konferencija'];
     }
 
-    /** Flag emoji per league — used in the Rezultati league group headers. */
+    /** Flag/badge emoji per league — used in the Rezultati league group headers. */
     public static function leagueFlag(string $leagueName): string
     {
         return match ($leagueName) {
@@ -54,6 +54,9 @@ class Accent
             'Bundesliga' => '🇩🇪',
             'Ligue 1' => '🇫🇷',
             'Evroliga', 'Evrokup' => '🇪🇺',
+            'Liga prvaka' => '⭐',
+            'Evropska liga' => '🟠',
+            'Liga konferencija' => '🟢',
             default => '🏳️',
         };
     }

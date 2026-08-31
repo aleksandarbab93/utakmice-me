@@ -8,7 +8,13 @@
         </div>
 
         <div class="mx-4 lg:mx-0 mt-4">
-            <x-standings-table :rows="$standings['rows']" :accent="$accent" :zones="$standings['zones']" />
+            @if (empty($standings['rows']))
+                <div class="border border-dashed border-white/[0.12] rounded-2xl p-6 text-center text-text-muted text-sm">
+                    Tabela još nije formirana — takmičenje je u fazi kvalifikacija.
+                </div>
+            @else
+                <x-standings-table :rows="$standings['rows']" :accent="$accent" :zones="$standings['zones']" />
+            @endif
         </div>
 
         @if ($standings['next'])

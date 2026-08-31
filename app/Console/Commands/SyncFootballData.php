@@ -25,6 +25,9 @@ class SyncFootballData extends Command
         135 => 'Serie A',
         78 => 'Bundesliga',
         61 => 'Ligue 1',
+        2 => 'Liga prvaka',
+        3 => 'Evropska liga',
+        848 => 'Liga konferencija',
     ];
 
     public function handle(SStatsClient $client): int
@@ -140,7 +143,9 @@ class SyncFootballData extends Command
     {
         return match ($apiStatus) {
             2 => 'scheduled',
-            8 => 'finished',
+            // 8 Finished, 9 Finished After Extra Time, 10 Finished After Penalty,
+            // 17/18 other finished/awarded variants (per SStats' own "Ended" filter).
+            8, 9, 10, 17, 18 => 'finished',
             default => 'live',
         };
     }
