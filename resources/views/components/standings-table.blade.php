@@ -12,22 +12,31 @@
 
 <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="w-full min-w-[600px] border-collapse font-mono table-fixed">
+        <table class="w-full lg:min-w-[600px] border-collapse font-mono table-fixed">
             <colgroup>
-                <col style="width:34px"><col><col style="width:34px"><col style="width:30px"><col style="width:30px"><col style="width:30px"><col style="width:52px"><col style="width:44px"><col style="width:38px"><col style="width:96px">
+                <col style="width:34px">
+                <col>
+                <col style="width:34px">
+                <col class="hidden lg:table-column" style="width:30px">
+                <col class="hidden lg:table-column" style="width:30px">
+                <col class="hidden lg:table-column" style="width:30px">
+                <col style="width:52px">
+                <col class="hidden lg:table-column" style="width:44px">
+                <col style="width:38px">
+                <col class="hidden lg:table-column" style="width:96px">
             </colgroup>
             <thead>
                 <tr class="border-b border-white/[0.07] text-[9px] tracking-[0.1em] text-text-dim">
                     <th class="px-2 py-2.5 text-left font-normal">#</th>
                     <th class="px-1 py-2.5 text-left font-normal">KLUB</th>
                     <th class="px-1 py-2.5 text-center font-normal">OS</th>
-                    <th class="px-1 py-2.5 text-center font-normal">P</th>
-                    <th class="px-1 py-2.5 text-center font-normal">N</th>
-                    <th class="px-1 py-2.5 text-center font-normal">I</th>
+                    <th class="hidden lg:table-cell px-1 py-2.5 text-center font-normal">P</th>
+                    <th class="hidden lg:table-cell px-1 py-2.5 text-center font-normal">N</th>
+                    <th class="hidden lg:table-cell px-1 py-2.5 text-center font-normal">I</th>
                     <th class="px-1 py-2.5 text-center font-normal">G</th>
-                    <th class="px-1 py-2.5 text-center font-normal">GR</th>
+                    <th class="hidden lg:table-cell px-1 py-2.5 text-center font-normal">GR</th>
                     <th class="px-1 py-2.5 text-center font-normal">B</th>
-                    <th class="px-2 py-2.5 text-right font-normal">FORMA</th>
+                    <th class="hidden lg:table-cell px-2 py-2.5 text-right font-normal">FORMA</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,13 +50,13 @@
                         </td>
                         <td class="px-1 py-3 font-sans text-[13.5px] {{ $row['pos'] === 1 ? 'font-bold' : 'font-semibold' }} truncate max-w-0">{{ $row['team'] }}</td>
                         <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['played'] }}</td>
-                        <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['won'] ?? '—' }}</td>
-                        <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['draw'] ?? '—' }}</td>
-                        <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['lost'] ?? '—' }}</td>
+                        <td class="hidden lg:table-cell px-1 py-3 text-xs text-text-2 text-center">{{ $row['won'] ?? '—' }}</td>
+                        <td class="hidden lg:table-cell px-1 py-3 text-xs text-text-2 text-center">{{ $row['draw'] ?? '—' }}</td>
+                        <td class="hidden lg:table-cell px-1 py-3 text-xs text-text-2 text-center">{{ $row['lost'] ?? '—' }}</td>
                         <td class="px-1 py-3 text-xs text-text-2 text-center whitespace-nowrap">{{ isset($row['goals_for']) ? $row['goals_for'].':'.$row['goals_against'] : '—' }}</td>
-                        <td class="px-1 py-3 text-xs text-center {{ str_starts_with($row['diff'], '+') ? 'text-positive' : (str_starts_with($row['diff'], '-') ? 'text-negative' : 'text-text-muted') }}">{{ $row['diff'] }}</td>
+                        <td class="hidden lg:table-cell px-1 py-3 text-xs text-center {{ str_starts_with($row['diff'], '+') ? 'text-positive' : (str_starts_with($row['diff'], '-') ? 'text-negative' : 'text-text-muted') }}">{{ $row['diff'] }}</td>
                         <td class="px-1 py-3 text-xs font-bold text-center">{{ $row['points'] }}</td>
-                        <td class="px-2 py-3">
+                        <td class="hidden lg:table-cell px-2 py-3">
                             <span class="flex items-center justify-end gap-1">
                                 @forelse (($row['form'] ?? []) as $r)
                                     <span class="w-4 h-4 rounded-[3px] flex items-center justify-center text-[8.5px] font-bold {{ $r === 'W' ? 'bg-positive/20 text-positive' : ($r === 'L' ? 'bg-negative/20 text-negative' : 'bg-white/10 text-text-muted') }}">{{ $r }}</span>
