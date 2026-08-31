@@ -16,7 +16,7 @@
             </button>
         @elseif ($active === 'scores')
             <span class="text-xl font-extrabold tracking-tight">Utakmice</span>
-            <span class="font-mono text-[10px] tracking-[0.12em] px-2.5 py-1.5 rounded-full bg-surface border border-white/[0.08] text-text-muted">FILTER</span>
+            <x-mobile-nav-drawer :sport="$sport" />
         @else
             <div class="flex items-center gap-3">
                 <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">

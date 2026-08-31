@@ -26,12 +26,12 @@
                         <button data-tab="uzivo" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">UŽIVO</button>
                         <button data-tab="favorizovani" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">FAVORIZOVANI</button>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <a href="{{ \App\Support\Nav::scores($sport, $prevDate) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted" style="width:34px;height:34px">
+                    <div class="flex items-center justify-between gap-3 w-full lg:w-auto lg:justify-start lg:gap-2">
+                        <a href="{{ \App\Support\Nav::scores($sport, $prevDate) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted flex-none" style="width:34px;height:34px">
                             <x-icon name="back" class="w-3.5 h-3.5" />
                         </a>
                         <span class="font-mono text-[12px] font-bold tracking-[0.08em] px-2 min-w-[90px] text-center">{{ $dateLabel }}</span>
-                        <a href="{{ \App\Support\Nav::scores($sport, $nextDate) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted rotate-180" style="width:34px;height:34px">
+                        <a href="{{ \App\Support\Nav::scores($sport, $nextDate) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted rotate-180 flex-none" style="width:34px;height:34px">
                             <x-icon name="back" class="w-3.5 h-3.5" />
                         </a>
                     </div>
