@@ -183,13 +183,10 @@ class MatchDetail
                     $homeId = (int) $fixture->homeTeam->external_id;
                     $awayId = (int) $fixture->awayTeam->external_id;
 
-                    $home = $fixture->homeTeam->name;
-                    $away = $fixture->awayTeam->name;
-
                     return [
-                        'h2h' => self::formatGames($client->headToHead($homeId, $awayId, 5), [$home, $away]),
-                        'home_form' => self::formatGames($client->teamForm($homeId, 5), [$home], $home),
-                        'away_form' => self::formatGames($client->teamForm($awayId, 5), [$away], $away),
+                        'h2h' => self::formatGames($client->headToHead($homeId, $awayId, 5)),
+                        'home_form' => self::formatGames($client->teamForm($homeId, 5), $fixture->homeTeam->name),
+                        'away_form' => self::formatGames($client->teamForm($awayId, 5), $fixture->awayTeam->name),
                     ];
                 }
             );
@@ -198,10 +195,10 @@ class MatchDetail
         }
     }
 
-    private static function formatGames(array $games, array $highlight = [], ?string $perspectiveTeam = null): array
+    private static function formatGames(array $games, ?string $perspectiveTeam = null): array
     {
         return collect($games)
-            ->map(function ($g) use ($highlight, $perspectiveTeam) {
+            ->map(function ($g) use ($perspectiveTeam) {
                 $home = $g['homeTeam']['name'] ?? '?';
                 $away = $g['awayTeam']['name'] ?? '?';
                 $hs = $g['homeResult'] ?? null;
@@ -225,8 +222,6 @@ class MatchDetail
                     'result' => $result,
                     'home_crest' => self::crestFor($home),
                     'away_crest' => self::crestFor($away),
-                    'home_highlight' => in_array($home, $highlight, true),
-                    'away_highlight' => in_array($away, $highlight, true),
                 ];
             })
             ->all();
