@@ -59,7 +59,7 @@
                                     @php
                                         $scoreColor = $m['status'] === 'live' ? 'text-live-text' : '';
                                     @endphp
-                                    <a href="{{ \App\Support\Nav::match($m['id']) }}" data-match-row data-match-id="{{ $m['id'] }}" data-status="{{ $m['status'] }}" class="flex items-center gap-3 px-3.5 py-3 border-b border-white/[0.05] last:border-0 hover:bg-white/[0.02]">
+                                    <a href="{{ $sport === 'fudbal' ? \App\Support\Nav::match($m['id']) : \App\Support\Nav::scores($sport) }}" data-match-row data-match-id="{{ $m['id'] }}" data-status="{{ $m['status'] }}" class="flex items-center gap-3 px-3.5 py-3 border-b border-white/[0.05] last:border-0 hover:bg-white/[0.02]">
                                         <button data-fav-star="{{ $m['id'] }}" class="flex-none w-5 h-5 flex items-center justify-center text-text-dim" aria-label="Favorizuj">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg>
                                         </button>

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Support\Accent;
+use App\Support\BasketballFeed;
 use App\Support\FootballFeed;
 use App\Support\PostFeed;
 use App\Support\SampleData;
-use App\Support\TeamBadge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -22,13 +22,13 @@ class SportController extends Controller
             $tab = 'uzivo';
         }
 
-        $liveTabs = $sport === 'fudbal' ? FootballFeed::homeLive() : SampleData::homeLive($sport);
+        $liveTabs = $sport === 'fudbal' ? FootballFeed::homeLive() : BasketballFeed::homeLive();
         $posts = $sport === 'fudbal' ? PostFeed::posts($sport)->all() : SampleData::posts($sport);
         $hero = array_shift($posts);
         $secondary = array_splice($posts, 0, 2);
         $latest = collect($posts)->take(4);
         $mostRead = collect(array_merge([$hero], $secondary))->filter()->take(3)->values();
-        $standings = $sport === 'fudbal' ? FootballFeed::standings() : SampleData::standings($sport);
+        $standings = $sport === 'fudbal' ? FootballFeed::standings() : BasketballFeed::standings();
 
         return view('home', [
             'sport' => $sport,
@@ -54,30 +54,7 @@ class SportController extends Controller
             ? Carbon::createFromFormat('Y-m-d', $request->query('date'))
             : Carbon::today();
 
-        if ($sport === 'fudbal') {
-            $groups = FootballFeed::matchesForDate($date);
-        } else {
-            $groups = collect(SampleData::matches($sport))
-                ->groupBy('league')
-                ->map(fn ($matches, $name) => [
-                    'name' => $name,
-                    'slug' => Str::slug($name),
-                    'flag' => Accent::leagueFlag($name),
-                    'matches' => collect($matches)->map(fn ($m, $i) => [
-                        'id' => $name.'-'.$i,
-                        'home' => $m['home'],
-                        'homeInitials' => TeamBadge::initials($m['home']),
-                        'away' => $m['away'],
-                        'awayInitials' => TeamBadge::initials($m['away']),
-                        'status' => $m['status'],
-                        'home_score' => $m['home_score'] ?? null,
-                        'away_score' => $m['away_score'] ?? null,
-                        'minute' => $m['minute'] ?? ($m['period'] ?? null),
-                        'kickoff' => $m['kickoff'] ?? null,
-                    ])->values(),
-                ])
-                ->values();
-        }
+        $groups = $sport === 'fudbal' ? FootballFeed::matchesForDate($date) : BasketballFeed::matchesForDate($date);
 
         return view('scores', [
             'sport' => $sport,
@@ -96,12 +73,10 @@ class SportController extends Controller
     {
         $this->validateSport($sport);
 
-        if ($sport === 'fudbal') {
-            $leagueSlug = $request->query('liga');
-            $standings = FootballFeed::standings($leagueSlug ? Str::slug($leagueSlug) : null);
-        } else {
-            $standings = SampleData::standings($sport);
-        }
+        $leagueSlug = $request->query('liga');
+        $standings = $sport === 'fudbal'
+            ? FootballFeed::standings($leagueSlug ? Str::slug($leagueSlug) : null)
+            : BasketballFeed::standings($leagueSlug ? Str::slug($leagueSlug) : null);
 
         return view('standings', [
             'sport' => $sport,

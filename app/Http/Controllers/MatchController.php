@@ -13,6 +13,8 @@ class MatchController extends Controller
     {
         $fixture->loadMissing(['homeTeam', 'awayTeam', 'league']);
 
+        abort_unless($fixture->league->sport === 'fudbal', 404);
+
         return view('match-detail', [
             'sport' => 'fudbal',
             'accent' => Accent::classes('fudbal'),
