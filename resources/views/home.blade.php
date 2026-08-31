@@ -40,11 +40,35 @@
                     </div>
                 </a>
             @empty
-                <div class="border border-dashed border-white/[0.12] rounded-2xl p-4.5 flex flex-col gap-2.5">
-                    <span class="text-base font-bold">Trenutno nema mečeva uživo</span>
-                    <span class="text-sm leading-relaxed text-text-muted">Sledeći termini su u tabu DANAS.</span>
-                    <a href="{{ \App\Support\Nav::home($sport, 'danas') }}" class="h-11 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-sm font-bold">Vidi današnji program</a>
-                </div>
+                @if ($openingRound)
+                    <div class="border border-dashed {{ $accent['tintBorder'] }} rounded-2xl p-4.5 flex flex-col gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $accent['bg'] }}"></span>
+                            <span class="font-mono text-[10px] font-bold tracking-[0.14em] {{ $accent['text'] }}">PRVO KOLO SEZONE &middot; {{ strtoupper($openingRound['label']) }}</span>
+                        </div>
+                        <div class="flex flex-col gap-2.5">
+                            @foreach (array_slice($openingRound['matches'], 0, 4) as $m)
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="flex flex-col gap-0.5 min-w-0">
+                                        <span class="text-sm font-semibold truncate">{{ $m['home'] }}</span>
+                                        <span class="text-sm font-semibold truncate">{{ $m['away'] }}</span>
+                                    </div>
+                                    <div class="flex flex-col items-end flex-none gap-0.5">
+                                        <span class="font-mono text-[10px] text-text-muted">{{ $m['status'] }}</span>
+                                        <span class="font-mono text-[8px] tracking-[0.08em] text-text-dim">{{ $m['league'] }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <a href="{{ \App\Support\Nav::scores($sport, $openingRound['date']->format('Y-m-d')) }}" class="h-11 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-sm font-bold">Vidi ceo raspored 1. kola</a>
+                    </div>
+                @else
+                    <div class="border border-dashed border-white/[0.12] rounded-2xl p-4.5 flex flex-col gap-2.5">
+                        <span class="text-base font-bold">Trenutno nema mečeva uživo</span>
+                        <span class="text-sm leading-relaxed text-text-muted">Sledeći termini su u tabu DANAS.</span>
+                        <a href="{{ \App\Support\Nav::home($sport, 'danas') }}" class="h-11 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-sm font-bold">Vidi današnji program</a>
+                    </div>
+                @endif
             @endforelse
             @if ($hasMoreMatches)
                 <a href="{{ \App\Support\Nav::scores($sport) }}" class="h-11 rounded-full flex items-center justify-center bg-surface border border-white/[0.08] text-text-2 text-sm font-semibold">Vidi sve rezultate &rsaquo;</a>
@@ -106,6 +130,26 @@
                 @if ($hasMoreMatches)
                     <a href="{{ \App\Support\Nav::scores($sport) }}" class="self-start h-9 px-4 rounded-full flex items-center bg-surface border border-white/[0.08] text-text-2 text-[13px] font-semibold">Vidi sve rezultate &rsaquo;</a>
                 @endif
+            @elseif ($openingRound)
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $accent['bg'] }}"></span>
+                        <span class="font-mono text-[10.5px] font-bold tracking-[0.14em] {{ $accent['text'] }}">PRVO KOLO SEZONE &middot; {{ strtoupper($openingRound['label']) }}</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3">
+                        @foreach (array_slice($openingRound['matches'], 0, 4) as $m)
+                            <div class="bg-surface border border-white/[0.07] rounded-2xl p-3.5 flex flex-col gap-2.5">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-mono text-[9px] tracking-[0.12em] text-text-muted">{{ $m['league'] }}</span>
+                                    <span class="font-mono text-[9.5px] font-bold tracking-[0.1em] text-text-muted">{{ $m['status'] }}</span>
+                                </div>
+                                <span class="text-sm font-semibold">{{ $m['home'] }}</span>
+                                <span class="text-sm font-semibold">{{ $m['away'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <a href="{{ \App\Support\Nav::scores($sport, $openingRound['date']->format('Y-m-d')) }}" class="self-start h-9 px-4 rounded-full flex items-center {{ $accent['bg'] }} text-bg text-[13px] font-bold">Vidi ceo raspored 1. kola &rsaquo;</a>
+                </div>
             @else
                 <div class="border border-dashed border-white/[0.12] rounded-2xl p-5.5 flex items-center justify-between gap-5">
                     <div class="flex flex-col gap-1.5">

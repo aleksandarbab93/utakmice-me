@@ -30,6 +30,13 @@ class SportController extends Controller
         $mostRead = collect(array_merge([$hero], $secondary))->filter()->take(3)->values();
         $standings = $sport === 'fudbal' ? FootballFeed::standings() : BasketballFeed::standings();
 
+        // Basketball's new season doesn't start for a while — while uživo/danas/sutra
+        // are all empty, feature the opening round's schedule instead of nothing.
+        $openingRound = null;
+        if ($sport === 'kosarka' && empty($liveTabs['uzivo']) && empty($liveTabs['danas']) && empty($liveTabs['sutra'])) {
+            $openingRound = BasketballFeed::openingRound();
+        }
+
         return view('home', [
             'sport' => $sport,
             'accent' => Accent::classes($sport),
@@ -37,6 +44,7 @@ class SportController extends Controller
             'tab' => $tab,
             'liveTabs' => $liveTabs,
             'activeMatches' => $liveTabs[$tab],
+            'openingRound' => $openingRound,
             'hero' => $hero,
             'secondary' => $secondary,
             'latest' => $latest,
@@ -55,6 +63,16 @@ class SportController extends Controller
             : Carbon::today();
 
         $groups = $sport === 'fudbal' ? FootballFeed::matchesForDate($date) : BasketballFeed::matchesForDate($date);
+
+        // No explicit date and nothing today — jump straight to the season
+        // opener's schedule instead of an empty "today" page.
+        if ($sport === 'kosarka' && ! $request->query('date') && $groups->isEmpty()) {
+            $nextDate = BasketballFeed::nextMatchDate();
+            if ($nextDate) {
+                $date = $nextDate;
+                $groups = BasketballFeed::matchesForDate($date);
+            }
+        }
 
         return view('scores', [
             'sport' => $sport,

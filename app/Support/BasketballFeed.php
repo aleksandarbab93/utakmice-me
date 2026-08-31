@@ -88,6 +88,53 @@ class BasketballFeed
         ];
     }
 
+    /** The next calendar day (today or later) that has any fixture — used to jump straight to the season opener while nothing is on today/tomorrow. */
+    public static function nextMatchDate(): ?Carbon
+    {
+        $leagueIds = self::leagues()->pluck('id');
+
+        $fixture = Fixture::whereIn('league_id', $leagueIds)
+            ->whereDate('kickoff_at', '>=', Carbon::today())
+            ->orderBy('kickoff_at')
+            ->first();
+
+        return $fixture?->kickoff_at->copy()->startOfDay();
+    }
+
+    /** The opening round's fixtures — a preseason stand-in for the home page's empty uživo/danas/sutra widget. */
+    public static function openingRound(): ?array
+    {
+        $date = self::nextMatchDate();
+
+        if (! $date) {
+            return null;
+        }
+
+        $leagueIds = self::leagues()->pluck('id');
+
+        $matches = Fixture::whereIn('league_id', $leagueIds)
+            ->whereDate('kickoff_at', $date)
+            ->with(['homeTeam', 'awayTeam', 'league'])
+            ->orderBy('kickoff_at')
+            ->get()
+            ->map(fn (Fixture $f) => [
+                'league' => strtoupper($f->league->name),
+                'status' => $f->kickoff_at->format('H:i'),
+                'live' => false,
+                'home' => $f->homeTeam->name,
+                'away' => $f->awayTeam->name,
+                'hs' => '–',
+                'as' => '–',
+            ])
+            ->all();
+
+        return [
+            'date' => $date,
+            'label' => FootballFeed::DAY_ABBR[$date->isoWeekday()].' '.$date->format('d.m.'),
+            'matches' => $matches,
+        ];
+    }
+
     /** Standings table for one league (by slug) — defaults to the first tracked league. */
     public static function standings(?string $leagueSlug = null): array
     {
