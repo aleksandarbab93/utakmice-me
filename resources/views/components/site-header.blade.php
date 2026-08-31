@@ -46,16 +46,6 @@
             <a href="{{ \App\Support\Nav::home($sport) }}" class="flex items-center gap-2.5">
                 <x-logo size="md" />
             </a>
-            <div class="flex gap-1 bg-surface border border-white/[0.08] rounded-[10px] p-1">
-                <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('fudbal') : ($active === 'standings' ? \App\Support\Nav::standings('fudbal') : \App\Support\Nav::home('fudbal')) }}"
-                   class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'fudbal' ? 'bg-accent-football text-bg font-bold' : 'text-text-muted font-semibold' }}">
-                    Fudbal
-                </a>
-                <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('kosarka') : ($active === 'standings' ? \App\Support\Nav::standings('kosarka') : \App\Support\Nav::home('kosarka')) }}"
-                   class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'kosarka' ? 'bg-accent-basketball text-bg font-bold' : 'text-text-muted font-semibold' }}">
-                    Košarka
-                </a>
-            </div>
             <nav class="flex gap-5 text-[13.5px] text-text-2">
                 <a href="{{ \App\Support\Nav::scores($sport) }}" class="{{ $active === 'scores' ? 'text-text font-semibold' : '' }}">Utakmice</a>
                 <a href="{{ \App\Support\Nav::standings($sport) }}" class="{{ $active === 'standings' ? 'text-text font-semibold' : '' }}">Tabele</a>
@@ -66,6 +56,20 @@
         <div class="w-64 h-9 rounded-full bg-surface border border-white/[0.08] flex items-center gap-2 px-3.5 text-text-dim text-[13px]">
             <x-icon name="search" class="w-3.5 h-3.5" />
             <span>Pretraga klubova i vijesti</span>
+        </div>
+    </div>
+
+    {{-- Sport switcher row --}}
+    <div class="hidden lg:flex items-center px-7 py-3 border-t border-white/[0.07]">
+        <div class="flex gap-1 bg-surface border border-white/[0.08] rounded-[10px] p-1">
+            <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('fudbal') : ($active === 'standings' ? \App\Support\Nav::standings('fudbal') : \App\Support\Nav::home('fudbal')) }}"
+               class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'fudbal' ? 'bg-accent-football text-bg font-bold' : 'text-text-muted font-semibold' }}">
+                Fudbal
+            </a>
+            <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('kosarka') : ($active === 'standings' ? \App\Support\Nav::standings('kosarka') : \App\Support\Nav::home('kosarka')) }}"
+               class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'kosarka' ? 'bg-accent-basketball text-bg font-bold' : 'text-text-muted font-semibold' }}">
+                Košarka
+            </a>
         </div>
     </div>
 </header>
