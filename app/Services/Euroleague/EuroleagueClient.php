@@ -2,6 +2,7 @@
 
 namespace App\Services\Euroleague;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -48,6 +49,53 @@ class EuroleagueClient
         }
 
         return $rows;
+    }
+
+    /**
+     * A team's last N *finished* games across the given seasons (most
+     * recent season first), most recent game first — for a match preview's
+     * "recent form", spanning past seasons since a new season starts with
+     * nobody having played yet.
+     */
+    public function teamRecentGames(string $competitionCode, array $seasonCodes, string $teamCode, int $limit = 5): array
+    {
+        return $this->seasonsGames($competitionCode, $seasonCodes)
+            ->filter(fn ($g) => $g['played'] && ($g['local']['club']['code'] === $teamCode || $g['road']['club']['code'] === $teamCode))
+            ->sortByDesc('date')
+            ->take($limit)
+            ->values()
+            ->all();
+    }
+
+    /** Last N finished meetings between two teams across the given seasons, most recent first. */
+    public function headToHead(string $competitionCode, array $seasonCodes, string $teamA, string $teamB, int $limit = 5): array
+    {
+        $pair = [$teamA, $teamB];
+
+        return $this->seasonsGames($competitionCode, $seasonCodes)
+            ->filter(fn ($g) => $g['played']
+                && in_array($g['local']['club']['code'], $pair, true)
+                && in_array($g['road']['club']['code'], $pair, true))
+            ->sortByDesc('date')
+            ->take($limit)
+            ->values()
+            ->all();
+    }
+
+    private function seasonsGames(string $competitionCode, array $seasonCodes): \Illuminate\Support\Collection
+    {
+        $games = collect();
+
+        foreach ($seasonCodes as $seasonCode) {
+            $cached = Cache::remember(
+                "euroleague-games:{$competitionCode}:{$seasonCode}",
+                now()->addMinutes(30),
+                fn () => $this->games($competitionCode, $seasonCode)
+            );
+            $games = $games->concat($cached);
+        }
+
+        return $games;
     }
 
     private function getJson(string $path): array
