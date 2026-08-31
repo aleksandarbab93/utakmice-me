@@ -56,10 +56,13 @@ class BasketballMatchDetail
             $homeCode = $fixture->homeTeam->external_id;
             $awayCode = $fixture->awayTeam->external_id;
 
+            $home = $fixture->homeTeam->name;
+            $away = $fixture->awayTeam->name;
+
             return [
-                'h2h' => self::formatGames($client->headToHead($competitionCode, $seasons, $homeCode, $awayCode)),
-                'home_form' => self::formatGames($client->teamRecentGames($competitionCode, $seasons, $homeCode), $fixture->homeTeam->name),
-                'away_form' => self::formatGames($client->teamRecentGames($competitionCode, $seasons, $awayCode), $fixture->awayTeam->name),
+                'h2h' => self::formatGames($client->headToHead($competitionCode, $seasons, $homeCode, $awayCode), [$home, $away]),
+                'home_form' => self::formatGames($client->teamRecentGames($competitionCode, $seasons, $homeCode), [$home], $home),
+                'away_form' => self::formatGames($client->teamRecentGames($competitionCode, $seasons, $awayCode), [$away], $away),
             ];
         } catch (\Throwable) {
             return null;
@@ -75,10 +78,10 @@ class BasketballMatchDetail
         return [$competitionCode.$year, $competitionCode.($year - 1), $competitionCode.($year - 2)];
     }
 
-    private static function formatGames(array $games, ?string $perspectiveTeam = null): array
+    private static function formatGames(array $games, array $highlight = [], ?string $perspectiveTeam = null): array
     {
         return collect($games)
-            ->map(function ($g) use ($perspectiveTeam) {
+            ->map(function ($g) use ($highlight, $perspectiveTeam) {
                 $home = $g['local']['club']['name'] ?? '?';
                 $away = $g['road']['club']['name'] ?? '?';
                 $hs = $g['local']['score'] ?? null;
@@ -100,6 +103,10 @@ class BasketballMatchDetail
                     'home_score' => $hs,
                     'away_score' => $as,
                     'result' => $result,
+                    'home_crest' => $g['local']['club']['images']['crest'] ?? null,
+                    'away_crest' => $g['road']['club']['images']['crest'] ?? null,
+                    'home_highlight' => in_array($home, $highlight, true),
+                    'away_highlight' => in_array($away, $highlight, true),
                 ];
             })
             ->all();

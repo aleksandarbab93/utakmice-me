@@ -183,10 +183,13 @@ class MatchDetail
                     $homeId = (int) $fixture->homeTeam->external_id;
                     $awayId = (int) $fixture->awayTeam->external_id;
 
+                    $home = $fixture->homeTeam->name;
+                    $away = $fixture->awayTeam->name;
+
                     return [
-                        'h2h' => self::formatGames($client->headToHead($homeId, $awayId, 5)),
-                        'home_form' => self::formatGames($client->teamForm($homeId, 5), $fixture->homeTeam->name),
-                        'away_form' => self::formatGames($client->teamForm($awayId, 5), $fixture->awayTeam->name),
+                        'h2h' => self::formatGames($client->headToHead($homeId, $awayId, 5), [$home, $away]),
+                        'home_form' => self::formatGames($client->teamForm($homeId, 5), [$home], $home),
+                        'away_form' => self::formatGames($client->teamForm($awayId, 5), [$away], $away),
                     ];
                 }
             );
@@ -195,10 +198,10 @@ class MatchDetail
         }
     }
 
-    private static function formatGames(array $games, ?string $perspectiveTeam = null): array
+    private static function formatGames(array $games, array $highlight = [], ?string $perspectiveTeam = null): array
     {
         return collect($games)
-            ->map(function ($g) use ($perspectiveTeam) {
+            ->map(function ($g) use ($highlight, $perspectiveTeam) {
                 $home = $g['homeTeam']['name'] ?? '?';
                 $away = $g['awayTeam']['name'] ?? '?';
                 $hs = $g['homeResult'] ?? null;
@@ -220,9 +223,25 @@ class MatchDetail
                     'home_score' => $hs,
                     'away_score' => $as,
                     'result' => $result,
+                    'home_crest' => self::crestFor($home),
+                    'away_crest' => self::crestFor($away),
+                    'home_highlight' => in_array($home, $highlight, true),
+                    'away_highlight' => in_array($away, $highlight, true),
                 ];
             })
             ->all();
+    }
+
+    /** Look up a crest for a team appearing in H2H/form history by name — cheap local lookup, no extra API calls. */
+    private static function crestFor(string $name): ?string
+    {
+        static $cache = [];
+
+        if (! array_key_exists($name, $cache)) {
+            $cache[$name] = \App\Models\Team::where('name', $name)->whereNotNull('crest_url')->value('crest_url');
+        }
+
+        return $cache[$name];
     }
 
     private static function stats(?array $detail): array
