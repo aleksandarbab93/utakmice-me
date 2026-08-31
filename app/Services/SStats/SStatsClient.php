@@ -39,6 +39,28 @@ class SStatsClient
         return $this->get("/games/{$gameId}")['data'] ?? null;
     }
 
+    /** Last N finished meetings between two teams, across all competitions, most recent first. */
+    public function headToHead(int $teamA, int $teamB, int $limit = 5): array
+    {
+        return $this->get('/games/list', [
+            'BothTeams' => "{$teamA},{$teamB}",
+            'Ended' => 'true',
+            'Order' => -1,
+            'Limit' => $limit,
+        ])['data'] ?? [];
+    }
+
+    /** A team's last N finished matches across all competitions, most recent first. */
+    public function teamForm(int $teamId, int $limit = 5): array
+    {
+        return $this->get('/games/list', [
+            'Team' => $teamId,
+            'Ended' => 'true',
+            'Order' => -1,
+            'Limit' => $limit,
+        ])['data'] ?? [];
+    }
+
     private function get(string $path, array $query = []): array
     {
         if ($this->apiKey) {

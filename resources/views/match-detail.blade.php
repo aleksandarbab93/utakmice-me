@@ -53,7 +53,7 @@
             @endif
         </div>
 
-        @if (empty($match['halves']) && empty($match['stats']))
+        @if (empty($match['halves']) && empty($match['stats']) && empty($match['preview']) && empty($match['standings']['rows']))
             <div class="border border-dashed border-white/[0.12] rounded-2xl p-6 text-center text-text-muted text-sm">
                 @if ($match['status'] === 'scheduled')
                     Meč još nije počeo — detalji toka meča biće dostupni nakon početka.
@@ -62,15 +62,34 @@
                 @endif
             </div>
         @else
-            <div class="flex gap-2" id="match-tabs">
-                <button data-match-tab="tok" class="match-tab-btn is-active-match-tab h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-white/[0.1]" style="height:34px">TOK MEČA</button>
-                <button data-match-tab="statistika" class="match-tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">STATISTIKA</button>
+            <div class="flex gap-2 flex-wrap" id="match-tabs">
+                @if (! empty($match['preview']))
+                    <button data-match-tab="pregled" class="match-tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">PREGLED</button>
+                @endif
+                @if (! empty($match['halves']))
+                    <button data-match-tab="tok" class="match-tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">TOK MEČA</button>
+                @endif
+                @if (! empty($match['stats']))
+                    <button data-match-tab="statistika" class="match-tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">STATISTIKA</button>
+                @endif
+                @if (! empty($match['standings']['rows']))
+                    <button data-match-tab="tablica" class="match-tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">TABLICA</button>
+                @endif
+            </div>
+        @endif
+
+        {{-- Pregled (H2H + forma) --}}
+        @if (! empty($match['preview']))
+            <div class="hidden flex-col gap-4" data-match-panel="pregled">
+                <x-match-form-list :games="$match['preview']['h2h']" title="Posljednji međusobni duel" />
+                <x-match-form-list :games="$match['preview']['home_form']" :title="'Posljednji mečevi: '.$match['home']['name']" />
+                <x-match-form-list :games="$match['preview']['away_form']" :title="'Posljednji mečevi: '.$match['away']['name']" />
             </div>
         @endif
 
         {{-- Tok meča --}}
         @if (! empty($match['halves']))
-            <div class="flex flex-col gap-3" data-match-panel="tok">
+            <div class="hidden flex-col gap-3" data-match-panel="tok">
                 <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
                     @foreach ($match['halves'] as $half)
                         <div class="px-3.5 py-2 bg-white/[0.03] border-b border-white/[0.05] flex items-center justify-between">
@@ -130,6 +149,13 @@
                         </div>
                     @endforeach
                 </div>
+            </div>
+        @endif
+
+        {{-- Tablica --}}
+        @if (! empty($match['standings']['rows']))
+            <div class="hidden" data-match-panel="tablica">
+                <x-standings-table :rows="$match['standings']['rows']" :zones="$match['standings']['zones']" :accent="$accent" :highlight="[$match['home']['name'], $match['away']['name']]" />
             </div>
         @endif
     </div>

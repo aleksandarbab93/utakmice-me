@@ -118,16 +118,29 @@ class FootballFeed
         $leagues = self::leagues();
         $league = ($leagueSlug ? $leagues->firstWhere('slug', $leagueSlug) : null) ?? $leagues->first();
 
-        $rows = Standing::where('league_id', $league->id)
-            ->with('team')
-            ->orderBy('position')
-            ->get()
+        $standings = Standing::where('league_id', $league->id)->with('team')->orderBy('position')->get();
+        $zones = Accent::leagueZones($league->name);
+        $relegationStart = $standings->count() - $zones['relegationCount'] + 1;
+
+        $rows = $standings
             ->map(fn (Standing $s) => [
                 'pos' => $s->position,
                 'team' => $s->team->name,
                 'played' => $s->played,
+                'won' => $s->won,
+                'draw' => $s->draw,
+                'lost' => $s->lost,
+                'goals_for' => $s->goals_for,
+                'goals_against' => $s->goals_against,
                 'points' => $s->points,
                 'diff' => ($s->goal_diff >= 0 ? '+' : '').$s->goal_diff,
+                'zone' => match (true) {
+                    in_array($s->position, $zones['cl'], true) => 'cl',
+                    in_array($s->position, $zones['el'], true) => 'el',
+                    $zones['relegationCount'] > 0 && $s->position >= $relegationStart => 'relegation',
+                    default => null,
+                },
+                'form' => self::teamForm($s->team_id, $league->id),
             ])
             ->all();
 
@@ -141,10 +154,32 @@ class FootballFeed
             'competition' => $league->name,
             'competitions' => $leagues->pluck('name')->all(),
             'rows' => $rows,
+            'zones' => $zones,
             'next' => $next ? [
                 'label' => $next->homeTeam->name.' — '.$next->awayTeam->name,
                 'when' => self::DAY_ABBR[$next->kickoff_at->isoWeekday()].' '.$next->kickoff_at->format('H:i'),
             ] : null,
         ];
+    }
+
+    /** A team's last 5 finished league matches (oldest first) as W/D/L letters. */
+    private static function teamForm(int $teamId, int $leagueId): array
+    {
+        return Fixture::where('league_id', $leagueId)
+            ->where('status', 'finished')
+            ->where(fn ($q) => $q->where('home_team_id', $teamId)->orWhere('away_team_id', $teamId))
+            ->orderByDesc('kickoff_at')
+            ->limit(5)
+            ->get()
+            ->reverse()
+            ->values()
+            ->map(function (Fixture $f) use ($teamId) {
+                $isHome = $f->home_team_id === $teamId;
+                $for = $isHome ? $f->home_score : $f->away_score;
+                $against = $isHome ? $f->away_score : $f->home_score;
+
+                return $for > $against ? 'W' : ($for < $against ? 'L' : 'D');
+            })
+            ->all();
     }
 }

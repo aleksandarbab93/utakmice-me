@@ -1,5 +1,5 @@
 <x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Tabele — Utakmice.me'">
-    <div class="max-w-md mx-auto lg:py-6">
+    <div class="max-w-2xl mx-auto lg:py-6">
         <div class="px-4 lg:px-0 pt-3 pb-1 flex gap-2 scrollrow">
             @foreach ($standings['competitions'] as $competition)
                 <a href="{{ \App\Support\Nav::standings($sport, \Illuminate\Support\Str::slug($competition)) }}"
@@ -8,7 +8,7 @@
         </div>
 
         <div class="mx-4 lg:mx-0 mt-4">
-            <x-standings-table :rows="$standings['rows']" :accent="$accent" />
+            <x-standings-table :rows="$standings['rows']" :accent="$accent" :zones="$standings['zones']" />
         </div>
 
         @if ($standings['next'])

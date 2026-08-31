@@ -113,6 +113,8 @@ class SyncFootballData extends Command
                     'won' => $row['wins'],
                     'draw' => $row['draws'],
                     'lost' => $row['loses'],
+                    'goals_for' => $row['goalsFor'],
+                    'goals_against' => $row['goalsAgainst'],
                     'points' => $row['points'],
                     'goal_diff' => $row['goalsFor'] - $row['goalsAgainst'],
                 ],

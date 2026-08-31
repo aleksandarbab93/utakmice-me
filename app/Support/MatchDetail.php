@@ -33,6 +33,18 @@ class MatchDetail
             'referee' => $detail['refereeName'] ?? null,
             'halves' => self::halves($detail, $fixture),
             'stats' => self::stats($detail),
+            'preview' => self::preview($fixture, $client),
+            'standings' => self::standingsFor($fixture),
+        ];
+    }
+
+    private static function standingsFor(Fixture $fixture): array
+    {
+        $standings = FootballFeed::standings($fixture->league->slug);
+
+        return [
+            'rows' => $standings['rows'] ?? [],
+            'zones' => $standings['zones'] ?? null,
         ];
     }
 
@@ -154,6 +166,63 @@ class MatchDetail
             'player' => $player,
             'subtitle' => $subtitle,
         ];
+    }
+
+    /** Head-to-head history + both teams' recent form — for matches that haven't started yet. */
+    private static function preview(Fixture $fixture, SStatsClient $client): ?array
+    {
+        if ($fixture->status !== 'scheduled') {
+            return null;
+        }
+
+        try {
+            return Cache::remember(
+                "match-preview:{$fixture->id}",
+                now()->addHours(6),
+                function () use ($client, $fixture) {
+                    $homeId = (int) $fixture->homeTeam->external_id;
+                    $awayId = (int) $fixture->awayTeam->external_id;
+
+                    return [
+                        'h2h' => self::formatGames($client->headToHead($homeId, $awayId, 5)),
+                        'home_form' => self::formatGames($client->teamForm($homeId, 5), $fixture->homeTeam->name),
+                        'away_form' => self::formatGames($client->teamForm($awayId, 5), $fixture->awayTeam->name),
+                    ];
+                }
+            );
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private static function formatGames(array $games, ?string $perspectiveTeam = null): array
+    {
+        return collect($games)
+            ->map(function ($g) use ($perspectiveTeam) {
+                $home = $g['homeTeam']['name'] ?? '?';
+                $away = $g['awayTeam']['name'] ?? '?';
+                $hs = $g['homeResult'] ?? null;
+                $as = $g['awayResult'] ?? null;
+
+                $result = null;
+                if ($perspectiveTeam && $hs !== null && $as !== null) {
+                    $isHome = $home === $perspectiveTeam;
+                    $for = $isHome ? $hs : $as;
+                    $against = $isHome ? $as : $hs;
+                    $result = $for > $against ? 'W' : ($for < $against ? 'L' : 'D');
+                }
+
+                return [
+                    'date' => isset($g['date']) ? \Illuminate\Support\Carbon::parse($g['date'])->format('d.m.y') : null,
+                    'competition' => $g['season']['league']['name'] ?? null,
+                    'home' => $home,
+                    'away' => $away,
+                    'home_score' => $hs,
+                    'away_score' => $as,
+                    'result' => $result,
+                ];
+            })
+            ->all();
     }
 
     private static function stats(?array $detail): array

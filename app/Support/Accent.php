@@ -57,4 +57,31 @@ class Accent
             default => '🏳️',
         };
     }
+
+    /**
+     * Table positions that qualify for Europe (Liga prvaka / Evropska liga)
+     * and that mean relegation, per league. Positions are 1-based table
+     * ranks, counted from the bottom for relegation.
+     */
+    public static function leagueZones(string $leagueName): array
+    {
+        return match ($leagueName) {
+            'Premijer liga', 'La Liga', 'Serie A' => [
+                'cl' => [1, 2, 3, 4],
+                'el' => [5],
+                'relegationCount' => 3,
+            ],
+            'Bundesliga' => [
+                'cl' => [1, 2, 3, 4],
+                'el' => [5],
+                'relegationCount' => 2,
+            ],
+            'Ligue 1' => [
+                'cl' => [1, 2, 3],
+                'el' => [4],
+                'relegationCount' => 2,
+            ],
+            default => ['cl' => [], 'el' => [], 'relegationCount' => 0],
+        };
+    }
 }
