@@ -16,7 +16,7 @@
         <div class="bg-surface border border-white/[0.07] rounded-2xl p-5 lg:p-7 flex flex-col gap-5">
             <div class="grid items-center gap-3" style="grid-template-columns:1fr auto 1fr">
                 <div class="flex flex-col items-center gap-2.5 text-center">
-                    <span class="w-14 h-14 rounded-full bg-surface-2 border border-white/[0.08] flex items-center justify-center text-base font-bold text-text-2">{{ $match['home']['initials'] }}</span>
+                    <x-team-badge :initials="$match['home']['initials']" :crest="$match['home']['crest'] ?? null" class="w-14 h-14 text-base" />
                     <span class="text-sm lg:text-[15px] font-bold">{{ $match['home']['name'] }}</span>
                 </div>
 
@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="flex flex-col items-center gap-2.5 text-center">
-                    <span class="w-14 h-14 rounded-full bg-surface-2 border border-white/[0.08] flex items-center justify-center text-base font-bold text-text-2">{{ $match['away']['initials'] }}</span>
+                    <x-team-badge :initials="$match['away']['initials']" :crest="$match['away']['crest'] ?? null" class="w-14 h-14 text-base" />
                     <span class="text-sm lg:text-[15px] font-bold">{{ $match['away']['name'] }}</span>
                 </div>
             </div>

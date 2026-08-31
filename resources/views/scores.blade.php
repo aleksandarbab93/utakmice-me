@@ -77,11 +77,11 @@
 
                                         <div class="flex-1 min-w-0 flex flex-col gap-1.5">
                                             <span class="flex items-center gap-2 min-w-0 {{ $awayWins ? 'text-text-muted' : '' }}">
-                                                <span class="w-6 h-6 rounded-full bg-surface-2 border border-white/[0.08] flex items-center justify-center text-[9px] font-bold text-text-2 flex-none">{{ $m['homeInitials'] }}</span>
+                                                <x-team-badge :initials="$m['homeInitials']" :crest="$m['homeCrest'] ?? null" class="w-6 h-6 text-[9px]" />
                                                 <span class="text-sm truncate {{ $awayWins ? '' : 'font-semibold' }}">{{ $m['home'] }}</span>
                                             </span>
                                             <span class="flex items-center gap-2 min-w-0 {{ $homeWins ? 'text-text-muted' : '' }}">
-                                                <span class="w-6 h-6 rounded-full bg-surface-2 border border-white/[0.08] flex items-center justify-center text-[9px] font-bold text-text-2 flex-none">{{ $m['awayInitials'] }}</span>
+                                                <x-team-badge :initials="$m['awayInitials']" :crest="$m['awayCrest'] ?? null" class="w-6 h-6 text-[9px]" />
                                                 <span class="text-sm truncate {{ $homeWins ? '' : 'font-semibold' }}">{{ $m['away'] }}</span>
                                             </span>
                                         </div>

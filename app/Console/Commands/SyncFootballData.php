@@ -7,6 +7,7 @@ use App\Models\League;
 use App\Models\Standing;
 use App\Models\Team;
 use App\Services\SStats\SStatsClient;
+use App\Services\TheSportsDb\TheSportsDbClient;
 use App\Support\MatchReportGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -30,7 +31,7 @@ class SyncFootballData extends Command
         848 => 'Liga konferencija',
     ];
 
-    public function handle(SStatsClient $client): int
+    public function handle(SStatsClient $client, TheSportsDbClient $crestClient): int
     {
         $year = $this->currentSeasonYear();
 
@@ -43,7 +44,7 @@ class SyncFootballData extends Command
             );
 
             try {
-                $this->syncFixtures($client, $league, $externalId, $year);
+                $this->syncFixtures($client, $crestClient, $league, $externalId, $year);
                 sleep(1);
                 $this->syncStandings($client, $league, $externalId, $year);
             } catch (\Throwable $e) {
@@ -64,14 +65,14 @@ class SyncFootballData extends Command
         return $now->month >= 7 ? $now->year : $now->year - 1;
     }
 
-    private function syncFixtures(SStatsClient $client, League $league, int $externalLeagueId, int $year): void
+    private function syncFixtures(SStatsClient $client, TheSportsDbClient $crestClient, League $league, int $externalLeagueId, int $year): void
     {
         $games = $client->fixtures($externalLeagueId, $year);
         $reportsGenerated = 0;
 
         foreach ($games as $game) {
-            $home = $this->upsertTeam($league, $game['homeTeam']);
-            $away = $this->upsertTeam($league, $game['awayTeam']);
+            $home = $this->upsertTeam($league, $game['homeTeam'], $crestClient);
+            $away = $this->upsertTeam($league, $game['awayTeam'], $crestClient);
 
             $fixture = Fixture::updateOrCreate(
                 ['external_source' => 'sstats', 'external_id' => (string) $game['id']],
@@ -127,14 +128,27 @@ class SyncFootballData extends Command
         $this->line('  standings: '.count($rows).' rows');
     }
 
-    private function upsertTeam(League $league, array $team): Team
+    private function upsertTeam(League $league, array $team, TheSportsDbClient $crestClient): Team
     {
+        $existing = Team::where('external_source', 'sstats')->where('external_id', (string) $team['id'])->first();
+
+        $crestUrl = $existing?->crest_url;
+        if (! $crestUrl) {
+            try {
+                $crestUrl = $crestClient->findTeamBadge($team['name']);
+                usleep(500000); // be considerate to the shared free-tier key (it rate-limits bursts)
+            } catch (\Throwable) {
+                $crestUrl = null;
+            }
+        }
+
         return Team::updateOrCreate(
             ['external_source' => 'sstats', 'external_id' => (string) $team['id']],
             [
                 'league_id' => $league->id,
                 'name' => $team['name'],
                 'short_name' => $team['name'],
+                'crest_url' => $crestUrl,
             ],
         );
     }
