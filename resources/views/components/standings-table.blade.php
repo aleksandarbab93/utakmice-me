@@ -12,36 +12,56 @@
 
 <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
     <div class="overflow-x-auto">
-        <div class="min-w-[560px]">
-            <div class="grid gap-2 px-3.5 py-2.5 border-b border-white/[0.07] font-mono text-[9px] tracking-[0.1em] text-text-dim" style="grid-template-columns:22px 1fr 28px 28px 28px 28px 48px 40px 36px 100px">
-                <span>#</span><span>KLUB</span><span class="text-center">OS</span><span class="text-center">P</span><span class="text-center">N</span><span class="text-center">I</span><span class="text-center">G</span><span class="text-center">GR</span><span class="text-center">B</span><span class="text-right">FORMA</span>
-            </div>
-            @foreach ($rows as $row)
-                <div class="grid gap-2 px-3.5 py-3 items-center {{ !$loop->last ? 'border-b border-white/[0.05]' : '' }} {{ in_array($row['team'], $highlight, true) ? 'bg-white/[0.04]' : '' }}">
-                    <span class="flex items-center gap-1.5" style="grid-column:1">
-                        @if (! empty($row['zone']))
-                            <span class="w-1.5 h-1.5 rounded-full flex-none {{ $zoneDot($row['zone']) }}"></span>
-                        @endif
-                        <span class="font-mono text-xs font-bold {{ $row['pos'] === 1 ? $accent['text'] : 'text-text-muted' }}">{{ $row['pos'] }}</span>
-                    </span>
-                    <span class="text-[13.5px] truncate {{ $row['pos'] === 1 ? 'font-bold' : 'font-semibold' }}" style="grid-column:2">{{ $row['team'] }}</span>
-                    <span class="font-mono text-xs text-text-2 text-center" style="grid-column:3">{{ $row['played'] }}</span>
-                    <span class="font-mono text-xs text-text-2 text-center" style="grid-column:4">{{ $row['won'] ?? '—' }}</span>
-                    <span class="font-mono text-xs text-text-2 text-center" style="grid-column:5">{{ $row['draw'] ?? '—' }}</span>
-                    <span class="font-mono text-xs text-text-2 text-center" style="grid-column:6">{{ $row['lost'] ?? '—' }}</span>
-                    <span class="font-mono text-xs text-text-2 text-center" style="grid-column:7">{{ isset($row['goals_for']) ? $row['goals_for'].':'.$row['goals_against'] : '—' }}</span>
-                    <span class="font-mono text-xs text-center {{ str_starts_with($row['diff'], '+') ? 'text-positive' : (str_starts_with($row['diff'], '-') ? 'text-negative' : 'text-text-muted') }}" style="grid-column:8">{{ $row['diff'] }}</span>
-                    <span class="font-mono text-xs font-bold text-center" style="grid-column:9">{{ $row['points'] }}</span>
-                    <span class="flex items-center justify-end gap-1" style="grid-column:10">
-                        @forelse (($row['form'] ?? []) as $r)
-                            <span class="w-4 h-4 rounded-[3px] flex items-center justify-center font-mono text-[8.5px] font-bold {{ $r === 'W' ? 'bg-positive/20 text-positive' : ($r === 'L' ? 'bg-negative/20 text-negative' : 'bg-white/10 text-text-muted') }}">{{ $r }}</span>
-                        @empty
-                            <span class="text-text-dim text-[10px]">—</span>
-                        @endforelse
-                    </span>
-                </div>
-            @endforeach
-        </div>
+        <table class="w-full min-w-[600px] border-collapse font-mono table-fixed">
+            <colgroup>
+                <col style="width:34px"><col><col style="width:34px"><col style="width:30px"><col style="width:30px"><col style="width:30px"><col style="width:52px"><col style="width:44px"><col style="width:38px"><col style="width:96px">
+            </colgroup>
+            <thead>
+                <tr class="border-b border-white/[0.07] text-[9px] tracking-[0.1em] text-text-dim">
+                    <th class="px-2 py-2.5 text-left font-normal">#</th>
+                    <th class="px-1 py-2.5 text-left font-normal">KLUB</th>
+                    <th class="px-1 py-2.5 text-center font-normal">OS</th>
+                    <th class="px-1 py-2.5 text-center font-normal">P</th>
+                    <th class="px-1 py-2.5 text-center font-normal">N</th>
+                    <th class="px-1 py-2.5 text-center font-normal">I</th>
+                    <th class="px-1 py-2.5 text-center font-normal">G</th>
+                    <th class="px-1 py-2.5 text-center font-normal">GR</th>
+                    <th class="px-1 py-2.5 text-center font-normal">B</th>
+                    <th class="px-2 py-2.5 text-right font-normal">FORMA</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($rows as $row)
+                    <tr class="{{ !$loop->last ? 'border-b border-white/[0.05]' : '' }} {{ in_array($row['team'], $highlight, true) ? 'bg-white/[0.04]' : '' }}">
+                        <td class="px-2 py-3">
+                            <span class="flex items-center gap-1.5">
+                                @if (! empty($row['zone']))
+                                    <span class="w-1.5 h-1.5 rounded-full flex-none {{ $zoneDot($row['zone']) }}"></span>
+                                @endif
+                                <span class="text-xs font-bold {{ $row['pos'] === 1 ? $accent['text'] : 'text-text-muted' }}">{{ $row['pos'] }}</span>
+                            </span>
+                        </td>
+                        <td class="px-1 py-3 font-sans text-[13.5px] {{ $row['pos'] === 1 ? 'font-bold' : 'font-semibold' }} truncate max-w-0">{{ $row['team'] }}</td>
+                        <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['played'] }}</td>
+                        <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['won'] ?? '—' }}</td>
+                        <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['draw'] ?? '—' }}</td>
+                        <td class="px-1 py-3 text-xs text-text-2 text-center">{{ $row['lost'] ?? '—' }}</td>
+                        <td class="px-1 py-3 text-xs text-text-2 text-center whitespace-nowrap">{{ isset($row['goals_for']) ? $row['goals_for'].':'.$row['goals_against'] : '—' }}</td>
+                        <td class="px-1 py-3 text-xs text-center {{ str_starts_with($row['diff'], '+') ? 'text-positive' : (str_starts_with($row['diff'], '-') ? 'text-negative' : 'text-text-muted') }}">{{ $row['diff'] }}</td>
+                        <td class="px-1 py-3 text-xs font-bold text-center">{{ $row['points'] }}</td>
+                        <td class="px-2 py-3">
+                            <span class="flex items-center justify-end gap-1">
+                                @forelse (($row['form'] ?? []) as $r)
+                                    <span class="w-4 h-4 rounded-[3px] flex items-center justify-center text-[8.5px] font-bold {{ $r === 'W' ? 'bg-positive/20 text-positive' : ($r === 'L' ? 'bg-negative/20 text-negative' : 'bg-white/10 text-text-muted') }}">{{ $r }}</span>
+                                @empty
+                                    <span class="text-text-dim text-[10px]">—</span>
+                                @endforelse
+                            </span>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 
     @if ($hasZones)
