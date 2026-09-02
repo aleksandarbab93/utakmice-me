@@ -40,4 +40,13 @@ return [
         'base_url' => env('SSTATS_BASE_URL', 'https://api.sstats.net'),
     ],
 
+    'youtube' => [
+        // No key needed — the channel feed and oEmbed are both public and
+        // free. Set YOUTUBE_API_KEY to also learn whether a video is live
+        // (oEmbed can only say whether it's embeddable).
+        'key' => env('YOUTUBE_API_KEY'),
+        'timeout' => (int) env('YOUTUBE_TIMEOUT', 10),
+        'oembed_cap' => (int) env('YOUTUBE_OEMBED_CAP', 40),
+    ],
+
 ];

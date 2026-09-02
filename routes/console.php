@@ -35,3 +35,9 @@ Schedule::command('basketball:sync')->everyFifteenMinutes()->withoutOverlapping(
 
 Schedule::command('football:sync-live')->everyMinute()->withoutOverlapping(5);
 Schedule::command('basketball:sync-live')->everyMinute()->withoutOverlapping(5);
+
+// Free broadcasts (Prenosi uživo): a feed read per channel, no key, no
+// quota — cheap enough to check often, and a channel that goes live twenty
+// minutes before kickoff is no use to anybody if it's noticed six hours
+// later.
+Schedule::command('streams:sync')->everyTenMinutes()->withoutOverlapping(15);

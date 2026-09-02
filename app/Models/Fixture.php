@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Fixture extends Model
 {
@@ -31,5 +33,20 @@ class Fixture extends Model
     public function awayTeam(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'away_team_id');
+    }
+
+    public function streams(): HasMany
+    {
+        return $this->hasMany(FixtureStream::class);
+    }
+
+    public function isLive(): bool
+    {
+        return $this->status === 'live';
+    }
+
+    public function scopeLive(Builder $query): Builder
+    {
+        return $query->where('status', 'live');
     }
 }

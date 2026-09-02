@@ -17,6 +17,13 @@
         @elseif ($active === 'scores')
             <span class="text-xl font-extrabold tracking-tight">Utakmice</span>
             <x-mobile-nav-drawer :sport="$sport" />
+        @elseif ($active === 'streams')
+            <div class="flex items-center gap-3">
+                <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
+                    <x-icon name="back" class="w-3.5 h-3.5" />
+                </a>
+                <span class="text-xl font-extrabold tracking-tight">Prenosi uživo</span>
+            </div>
         @else
             <div class="flex items-center gap-3">
                 <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
@@ -27,7 +34,7 @@
         @endif
     </div>
 
-    @if ($active !== 'standings')
+    @if (! in_array($active, ['standings', 'streams'], true))
         <div class="lg:hidden px-4 pb-3 flex gap-1.5">
             <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('fudbal') : \App\Support\Nav::home('fudbal') }}"
                class="flex-1 h-10 rounded-[10px] flex items-center justify-center text-sm font-bold {{ $sport === 'fudbal' ? 'bg-accent-football text-bg' : 'bg-surface border border-white/[0.08] text-text-muted font-semibold' }}">
@@ -50,7 +57,7 @@
                 <a href="{{ \App\Support\Nav::scores($sport) }}" class="{{ $active === 'scores' ? 'text-text font-semibold' : '' }}">Utakmice</a>
                 <a href="{{ \App\Support\Nav::standings($sport) }}" class="{{ $active === 'standings' ? 'text-text font-semibold' : '' }}">Tabele</a>
                 <a href="{{ \App\Support\Nav::home($sport) }}">Vijesti</a>
-                <a href="#">Prenosi</a>
+                <a href="{{ route('streams') }}" class="{{ $active === 'streams' ? 'text-text font-semibold' : '' }}">Prenosi uživo</a>
             </nav>
         </div>
         <div class="w-64 h-9 rounded-full bg-surface border border-white/[0.08] flex items-center gap-2 px-3.5 text-text-dim text-[13px]">
@@ -60,6 +67,7 @@
     </div>
 
     {{-- Sport switcher row --}}
+    @if ($active !== 'streams')
     <div class="hidden lg:flex items-center px-7 py-3 border-t border-white/[0.07]">
         <div class="flex gap-1 bg-surface border border-white/[0.08] rounded-[10px] p-1">
             <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('fudbal') : ($active === 'standings' ? \App\Support\Nav::standings('fudbal') : \App\Support\Nav::home('fudbal')) }}"
@@ -72,4 +80,5 @@
             </a>
         </div>
     </div>
+    @endif
 </header>

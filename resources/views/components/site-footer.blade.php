@@ -34,7 +34,7 @@
                 <a href="{{ \App\Support\Nav::scores($sport) }}" class="text-[13.5px] text-text-2">Utakmice</a>
                 <a href="{{ \App\Support\Nav::standings($sport) }}" class="text-[13.5px] text-text-2">Tabele</a>
                 <a href="{{ \App\Support\Nav::home($sport) }}" class="text-[13.5px] text-text-2">Vijesti</a>
-                <span class="text-[13.5px] text-text-2">Prenosi</span>
+                <a href="{{ route('streams') }}" class="text-[13.5px] text-text-2">Prenosi uživo</a>
                 <span class="text-[13.5px] text-text-2">Statistika</span>
             </div>
 

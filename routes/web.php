@@ -3,6 +3,7 @@
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SportController;
+use App\Http\Controllers\StreamsController;
 use Illuminate\Support\Facades\Route;
 
 // Fudbal lives at the site root — no /fudbal prefix.
@@ -36,6 +37,9 @@ Route::get('/vijesti/{slug}', [PostController::class, 'show'])
 
 Route::get('/mec/{fixture}', [MatchController::class, 'show'])
     ->name('match.show');
+
+Route::get('/prenosi-uzivo', [StreamsController::class, 'index'])
+    ->name('streams');
 
 // Old URLs redirect to the new root-based scheme.
 Route::redirect('/fudbal', '/');
