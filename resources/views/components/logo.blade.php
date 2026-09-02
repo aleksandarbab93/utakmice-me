@@ -1,9 +1,9 @@
 @props(['size' => 'sm'])
 
 @php
-    $ring = $size === 'md' ? 'w-[22px] h-[22px] border-[3px]' : 'w-5 h-5 border-2';
+    $barHeight = $size === 'md' ? 'h-[20px]' : 'h-[16px]';
     $text = $size === 'md' ? 'text-[19px]' : 'text-[17px]';
 @endphp
 
-<span class="rounded-full border-brand {{ $ring }}"></span>
-<span class="{{ $text }} font-extrabold tracking-tight">UTAKMICE<span class="text-brand">.ME</span></span>
+<span class="w-[3px] {{ $barHeight }} rounded-full bg-accent flex-none"></span>
+<span class="{{ $text }} font-extrabold tracking-tight lowercase text-text">utakmice<span class="text-accent">.me</span></span>

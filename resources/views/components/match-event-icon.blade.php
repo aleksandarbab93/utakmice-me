@@ -2,7 +2,7 @@
 
 @php
     $classes = match ($icon) {
-        'goal' => 'text-accent-football',
+        'goal' => 'text-accent',
         'og' => 'text-live-text',
         'miss' => 'text-text-dim',
         'cancel' => 'text-text-dim line-through',

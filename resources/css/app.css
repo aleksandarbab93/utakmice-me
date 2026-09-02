@@ -18,10 +18,9 @@
     --color-text-muted: #98A1AE;
     --color-text-dim: #6B7480;
 
-    --color-brand: #F2F4F7;
-
-    --color-accent-football: #C6E64B;
-    --color-accent-basketball: #FF6A2B;
+    /* One brand color for the whole site — football and basketball differ
+       only in typography/labels from here on, never in color. */
+    --color-accent: #FF6A2B;
 
     --color-live: #F2453D;
     --color-live-text: #FF7A73;
@@ -38,7 +37,7 @@ a {
 }
 
 .link-hover:hover {
-    color: var(--color-accent-football);
+    color: var(--color-accent);
 }
 
 @keyframes livePulse {

@@ -37,11 +37,11 @@
     @if (! in_array($active, ['standings', 'streams'], true))
         <div class="lg:hidden px-4 pb-3 flex gap-1.5">
             <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('fudbal') : \App\Support\Nav::home('fudbal') }}"
-               class="flex-1 h-10 rounded-[10px] flex items-center justify-center text-sm font-bold {{ $sport === 'fudbal' ? 'bg-accent-football text-bg' : 'bg-surface border border-white/[0.08] text-text-muted font-semibold' }}">
+               class="flex-1 h-10 rounded-[10px] flex items-center justify-center text-sm font-bold {{ $sport === 'fudbal' ? 'bg-accent text-bg' : 'bg-surface border border-white/[0.08] text-text-muted font-semibold' }}">
                 Fudbal
             </a>
             <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('kosarka') : \App\Support\Nav::home('kosarka') }}"
-               class="flex-1 h-10 rounded-[10px] flex items-center justify-center text-sm font-bold {{ $sport === 'kosarka' ? 'bg-accent-basketball text-bg' : 'bg-surface border border-white/[0.08] text-text-muted font-semibold' }}">
+               class="flex-1 h-10 rounded-[10px] flex items-center justify-center text-sm font-bold {{ $sport === 'kosarka' ? 'bg-accent text-bg' : 'bg-surface border border-white/[0.08] text-text-muted font-semibold' }}">
                 Košarka
             </a>
         </div>
@@ -71,11 +71,11 @@
     <div class="hidden lg:flex items-center px-7 py-3 border-t border-white/[0.07]">
         <div class="flex gap-1 bg-surface border border-white/[0.08] rounded-[10px] p-1">
             <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('fudbal') : ($active === 'standings' ? \App\Support\Nav::standings('fudbal') : \App\Support\Nav::home('fudbal')) }}"
-               class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'fudbal' ? 'bg-accent-football text-bg font-bold' : 'text-text-muted font-semibold' }}">
+               class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'fudbal' ? 'bg-accent text-bg font-bold' : 'text-text-muted font-semibold' }}">
                 Fudbal
             </a>
             <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('kosarka') : ($active === 'standings' ? \App\Support\Nav::standings('kosarka') : \App\Support\Nav::home('kosarka')) }}"
-               class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'kosarka' ? 'bg-accent-basketball text-bg font-bold' : 'text-text-muted font-semibold' }}">
+               class="px-4.5 py-1.5 rounded-[7px] text-[13.5px] {{ $sport === 'kosarka' ? 'bg-accent text-bg font-bold' : 'text-text-muted font-semibold' }}">
                 Košarka
             </a>
         </div>

@@ -130,7 +130,7 @@
             function paintStar(btn, isFav) {
                 const svg = btn.querySelector('svg');
                 svg.setAttribute('fill', isFav ? 'currentColor' : 'none');
-                btn.classList.toggle('text-accent-football', isFav);
+                btn.classList.toggle('text-accent', isFav);
                 btn.classList.toggle('text-text-dim', !isFav);
             }
 
