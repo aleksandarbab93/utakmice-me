@@ -39,6 +39,31 @@ class SStatsClient
         return $this->get("/games/{$gameId}")['data'] ?? null;
     }
 
+    /**
+     * Every live match worldwide, in one call — SStats has no per-league
+     * live filter, so this is deliberately unscoped; the caller matches
+     * rows against its own tracked fixtures by external_id.
+     */
+    public function liveGames(): array
+    {
+        return $this->get('/games/list', ['Live' => 'true'])['data'] ?? [];
+    }
+
+    /**
+     * SStats' numeric match-status code, mapped to our three-value status.
+     * 2 = Not Started. 8/9/10/17/18 = finished in some form (normal time,
+     * extra time, penalties, or another settled/awarded variant — SStats'
+     * own "Ended" filter groups exactly these). Everything else is live.
+     */
+    public static function mapStatus(int $apiStatus): string
+    {
+        return match ($apiStatus) {
+            2 => 'scheduled',
+            8, 9, 10, 17, 18 => 'finished',
+            default => 'live',
+        };
+    }
+
     /** Last N finished meetings between two teams, across all competitions, most recent first. */
     public function headToHead(int $teamA, int $teamB, int $limit = 5): array
     {

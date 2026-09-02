@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Fixture;
 use App\Models\League;
-use App\Models\Standing;
 use App\Models\Team;
 use App\Services\SStats\SStatsClient;
 use App\Services\TheSportsDb\TheSportsDbClient;
@@ -46,7 +45,7 @@ class SyncFootballData extends Command
             try {
                 $this->syncFixtures($client, $crestClient, $league, $externalId, $year);
                 sleep(1);
-                $this->syncStandings($client, $league, $externalId, $year);
+                $this->call('football:sync-standings', ['--league-id' => $league->id]);
             } catch (\Throwable $e) {
                 $this->error("  {$name}: {$e->getMessage()}");
             }
@@ -81,7 +80,7 @@ class SyncFootballData extends Command
                     'home_team_id' => $home->id,
                     'away_team_id' => $away->id,
                     'kickoff_at' => $game['date'],
-                    'status' => $this->mapStatus($game['status']),
+                    'status' => SStatsClient::mapStatus($game['status']),
                     'home_score' => $game['homeResult'],
                     'away_score' => $game['awayResult'],
                     'minute' => $game['elapsed'] ?? null,
@@ -96,36 +95,6 @@ class SyncFootballData extends Command
         }
 
         $this->line('  fixtures: '.count($games).' rows'.($reportsGenerated ? ", {$reportsGenerated} new reports" : ''));
-    }
-
-    private function syncStandings(SStatsClient $client, League $league, int $externalLeagueId, int $year): void
-    {
-        $rows = $client->standings($externalLeagueId, $year);
-
-        foreach ($rows as $row) {
-            $team = Team::where('external_source', 'sstats')->where('external_id', (string) $row['teamId'])->first();
-
-            if (! $team) {
-                continue; // team not seen in any fixture yet — skip rather than guess a name
-            }
-
-            Standing::updateOrCreate(
-                ['league_id' => $league->id, 'team_id' => $team->id],
-                [
-                    'position' => $row['rank'],
-                    'played' => $row['played'],
-                    'won' => $row['wins'],
-                    'draw' => $row['draws'],
-                    'lost' => $row['loses'],
-                    'goals_for' => $row['goalsFor'],
-                    'goals_against' => $row['goalsAgainst'],
-                    'points' => $row['points'],
-                    'goal_diff' => $row['goalsFor'] - $row['goalsAgainst'],
-                ],
-            );
-        }
-
-        $this->line('  standings: '.count($rows).' rows');
     }
 
     private function upsertTeam(League $league, array $team, TheSportsDbClient $crestClient): Team
@@ -151,16 +120,5 @@ class SyncFootballData extends Command
                 'crest_url' => $crestUrl,
             ],
         );
-    }
-
-    private function mapStatus(int $apiStatus): string
-    {
-        return match ($apiStatus) {
-            2 => 'scheduled',
-            // 8 Finished, 9 Finished After Extra Time, 10 Finished After Penalty,
-            // 17/18 other finished/awarded variants (per SStats' own "Ended" filter).
-            8, 9, 10, 17, 18 => 'finished',
-            default => 'live',
-        };
     }
 }
