@@ -17,6 +17,9 @@ use Illuminate\Support\Str;
  */
 class MatchReportGenerator
 {
+    /** Izveštaji se generišu samo za "ligu petice" i Ligu šampiona — ne i za regionalne lige, Ligue 1, Evropsku ligu ili Ligu konferencija. */
+    private const ELIGIBLE_LEAGUES = ['Premijer liga', 'Serie A', 'Bundesliga', 'La Liga', 'Liga prvaka'];
+
     public static function generate(Fixture $fixture, SStatsClient $client): ?Post
     {
         if ($fixture->status !== 'finished' || $fixture->home_score === null || $fixture->away_score === null) {
@@ -34,6 +37,10 @@ class MatchReportGenerator
         $as = $fixture->away_score;
         $league = $fixture->league->name;
 
+        if (! in_array($league, self::ELIGIBLE_LEAGUES, true)) {
+            return null;
+        }
+
         $detail = null;
         try {
             $detail = $client->gameDetail((int) $fixture->external_id);
@@ -42,7 +49,10 @@ class MatchReportGenerator
         }
 
         $variant = $fixture->id % 3;
-        $title = "{$home} - {$away} {$hs}:{$as}";
+        $goals = MatchDetail::events($detail)->filter(fn ($e) => in_array($e['icon'], ['goal', 'og'], true))->values();
+        $redCardEvent = MatchDetail::events($detail)->first(fn ($e) => $e['icon'] === 'red');
+
+        $title = self::headline($variant, $home, $away, $hs, $as, $league, $goals, $redCardEvent, $detail);
         $slug = Str::slug($title.'-'.$fixture->id);
 
         $intro = self::opener($variant, $home, $away, $hs, $as, $league);
@@ -74,6 +84,122 @@ class MatchReportGenerator
             'fixture_id' => $fixture->id,
             'published_at' => self::estimatedFullTime($fixture),
         ]);
+    }
+
+    /**
+     * Picks the most compelling real detail from the match to lead the
+     * headline with — a hat-trick, a comeback, a late decider, a rout, or a
+     * dramatic equalizer — falling back to a plain scoreline when nothing in
+     * the event data stands out. Never invents a detail the API didn't give us.
+     */
+    private static function headline(int $variant, string $home, string $away, int $hs, int $as, string $league, \Illuminate\Support\Collection $goals, ?array $redCard, ?array $detail): string
+    {
+        $generic = "{$home} - {$away} {$hs}:{$as}";
+
+        if ($goals->isEmpty()) {
+            return $generic;
+        }
+
+        $winnerSide = $hs > $as ? 'home' : ($as > $hs ? 'away' : null);
+        $winner = $winnerSide === 'home' ? $home : ($winnerSide === 'away' ? $away : null);
+        $loser = $winnerSide === 'home' ? $away : ($winnerSide === 'away' ? $home : null);
+
+        if ($winner !== null) {
+            $scorerCounts = [];
+            foreach ($goals as $g) {
+                if ($g['icon'] !== 'goal') {
+                    continue;
+                }
+                $key = $g['side'].'|'.$g['player'];
+                $scorerCounts[$key] = ($scorerCounts[$key] ?? 0) + 1;
+            }
+
+            foreach ($scorerCounts as $key => $count) {
+                if ($count < 3) {
+                    continue;
+                }
+                [$side, $player] = explode('|', $key, 2);
+                if (($side === 'home' ? $home : $away) !== $winner) {
+                    continue;
+                }
+                $feat = $count >= 4 ? "sa {$count} gola" : 'hat-trikom';
+
+                return "{$player} {$feat} predvodio {$winner} do pobjede protiv {$loser} ({$hs}:{$as})";
+            }
+        }
+
+        // Chronological score progression, to spot a comeback and the goal that decided the winner.
+        $runningHome = 0;
+        $runningAway = 0;
+        $winnerTrailed = false;
+        $decisiveGoal = null;
+        $priorLeader = null;
+
+        foreach ($goals as $g) {
+            $isOwnGoal = $g['icon'] === 'og';
+            $creditSide = $isOwnGoal ? ($g['side'] === 'home' ? 'away' : 'home') : $g['side'];
+
+            if ($creditSide === 'home') {
+                $runningHome++;
+            } else {
+                $runningAway++;
+            }
+
+            if ($winnerSide === 'home' && $runningAway > $runningHome) {
+                $winnerTrailed = true;
+            } elseif ($winnerSide === 'away' && $runningHome > $runningAway) {
+                $winnerTrailed = true;
+            }
+
+            $currentLeader = $runningHome === $runningAway ? null : ($runningHome > $runningAway ? 'home' : 'away');
+            if ($currentLeader !== null && $currentLeader === $winnerSide && $currentLeader !== $priorLeader) {
+                $decisiveGoal = $g;
+            }
+            $priorLeader = $currentLeader;
+        }
+
+        if ($winner !== null && $winnerTrailed) {
+            return "Preokret: {$winner} stigao do pobjede protiv {$loser} ({$hs}:{$as})";
+        }
+
+        if ($winner !== null && $decisiveGoal !== null) {
+            $minute = (int) $decisiveGoal['elapsed'];
+            if ($minute >= 80 || $decisiveGoal['extra']) {
+                $scorer = $decisiveGoal['player'];
+                $minuteLabel = $decisiveGoal['elapsed'].($decisiveGoal['extra'] ? '+'.$decisiveGoal['extra'] : '');
+
+                return "{$scorer} u {$minuteLabel}. minutu donio pobjedu {$winner} protiv {$loser} ({$hs}:{$as})";
+            }
+        }
+
+        if ($winner !== null && abs($hs - $as) >= 3) {
+            return "{$winner} razbio {$loser} rezultatom {$hs}:{$as}";
+        }
+
+        if ($winnerSide === null) {
+            $lastGoal = $goals->last();
+            $minute = (int) $lastGoal['elapsed'];
+            if ($minute >= 80 || $lastGoal['extra']) {
+                $isOwnGoal = $lastGoal['icon'] === 'og';
+                $creditSide = $isOwnGoal ? ($lastGoal['side'] === 'home' ? 'away' : 'home') : $lastGoal['side'];
+                $team = $creditSide === 'home' ? $home : $away;
+                $other = $creditSide === 'home' ? $away : $home;
+                $minuteLabel = $lastGoal['elapsed'].($lastGoal['extra'] ? '+'.$lastGoal['extra'] : '');
+
+                return "{$team} u {$minuteLabel}. minutu spasio bod protiv {$other} ({$hs}:{$as})";
+            }
+        }
+
+        if ($redCard !== null && $winner !== null) {
+            $downTeam = $redCard['side'] === 'home' ? $home : $away;
+            if ($downTeam === $loser) {
+                return "{$winner} slavio protiv {$loser}a koji je igrao sa igračem manje ({$hs}:{$as})";
+            }
+        }
+
+        return $winnerSide === null
+            ? "{$home} i {$away} remizirali {$hs}:{$as}"
+            : "{$winner} slavio protiv {$loser} rezultatom {$hs}:{$as}";
     }
 
     private static function opener(int $variant, string $home, string $away, int $hs, int $as, string $league): string
