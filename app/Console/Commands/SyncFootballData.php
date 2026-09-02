@@ -28,6 +28,13 @@ class SyncFootballData extends Command
         2 => 'Liga prvaka',
         3 => 'Evropska liga',
         848 => 'Liga konferencija',
+        // Region.
+        286 => 'Superliga Srbije',
+        355 => 'Prva crnogorska liga',
+        315 => 'Premijer liga BiH',
+        210 => 'HNL',
+        373 => '1. SNL',
+        371 => 'Prva liga Makedonije',
     ];
 
     public function handle(SStatsClient $client, TheSportsDbClient $crestClient): int

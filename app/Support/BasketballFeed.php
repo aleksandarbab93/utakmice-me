@@ -57,7 +57,7 @@ class BasketballFeed
             return [
                 'name' => $league->name,
                 'slug' => $league->slug,
-                'flag' => Accent::leagueFlag($league->name),
+                'flag' => Accent::leagueIcon($league->name),
                 'matches' => $matches,
             ];
         })->filter(fn ($group) => $group['matches']->isNotEmpty())->values();

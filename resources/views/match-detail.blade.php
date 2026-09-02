@@ -5,7 +5,8 @@
         <div class="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-text-dim">
             <a href="{{ \App\Support\Nav::home('fudbal') }}" class="{{ $accent['text'] }}">FUDBAL</a>
             <span>&rsaquo;</span>
-            <span>{{ $match['flag'] }} {{ strtoupper($match['league']) }}</span>
+            <x-league-icon :icon="$match['flag']" class="w-4 h-3" />
+            <span>{{ strtoupper($match['league']) }}</span>
             @if ($match['round'])
                 <span>&rsaquo;</span>
                 <span>{{ strtoupper($match['round']) }}</span>

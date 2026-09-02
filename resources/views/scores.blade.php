@@ -9,7 +9,7 @@
                     @foreach ($leagues as $league)
                         <div class="flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-surface">
                             <a href="#liga-{{ $league['slug'] }}" class="flex items-center gap-2 text-[13.5px] text-text-2 min-w-0">
-                                <span>{{ \App\Support\Accent::leagueFlag($league['name']) }}</span>
+                                <x-league-icon :icon="\App\Support\Accent::leagueIcon($league['name'])" class="w-4 h-3" />
                                 <span class="truncate">{{ $league['name'] }}</span>
                             </a>
                             <a href="{{ \App\Support\Nav::standings($sport, $league['slug']) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela</a>
@@ -44,7 +44,7 @@
                             <div class="flex items-center justify-between gap-2 mb-2">
                                 <button data-collapse-toggle class="flex items-center gap-2.5 min-w-0">
                                     <span class="w-[3px] h-3.5 rounded {{ $accent['bg'] }} flex-none"></span>
-                                    <span>{{ $group['flag'] }}</span>
+                                    <x-league-icon :icon="$group['flag']" class="w-4 h-3" />
                                     <span class="font-mono text-[10px] font-bold tracking-[0.16em] text-text-2 truncate">{{ strtoupper($group['name']) }}</span>
                                     <svg data-chevron width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-text-dim transition-transform"><path d="M6 9l6 6 6-6"/></svg>
                                 </button>

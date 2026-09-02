@@ -41,23 +41,40 @@ class Accent
     {
         return $sport === 'kosarka'
             ? ['Evroliga', 'Evrokup']
-            : ['Premijer liga', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Liga prvaka', 'Evropska liga', 'Liga konferencija'];
+            : [
+                'Premijer liga', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1',
+                'Liga prvaka', 'Evropska liga', 'Liga konferencija',
+                'Superliga Srbije', 'Prva crnogorska liga', 'Premijer liga BiH', 'HNL', '1. SNL', 'Prva liga Makedonije',
+            ];
     }
 
-    /** Flag/badge emoji per league — used in the Rezultati league group headers. */
-    public static function leagueFlag(string $leagueName): string
+    /**
+     * A real flag/badge image per league — country flags and UEFA club-
+     * competition badges, off api-sports.io's free keyless media CDN (its
+     * league/team ids are the same ones SStats.net uses, and country flags
+     * are just an ISO code away). 'badge' images are dark artwork on a
+     * transparent background and need a light tile behind them; 'flag'
+     * images are opaque and don't.
+     */
+    public static function leagueIcon(string $leagueName): array
     {
         return match ($leagueName) {
-            'Premijer liga' => '🇬🇧',
-            'La Liga' => '🇪🇸',
-            'Serie A' => '🇮🇹',
-            'Bundesliga' => '🇩🇪',
-            'Ligue 1' => '🇫🇷',
-            'Evroliga', 'Evrokup' => '🇪🇺',
-            'Liga prvaka' => '⭐',
-            'Evropska liga' => '🟠',
-            'Liga konferencija' => '🟢',
-            default => '🏳️',
+            'Premijer liga' => ['url' => 'https://media.api-sports.io/flags/gb-eng.svg', 'type' => 'flag'],
+            'La Liga' => ['url' => 'https://media.api-sports.io/flags/es.svg', 'type' => 'flag'],
+            'Serie A' => ['url' => 'https://media.api-sports.io/flags/it.svg', 'type' => 'flag'],
+            'Bundesliga' => ['url' => 'https://media.api-sports.io/flags/de.svg', 'type' => 'flag'],
+            'Ligue 1' => ['url' => 'https://media.api-sports.io/flags/fr.svg', 'type' => 'flag'],
+            'Superliga Srbije' => ['url' => 'https://media.api-sports.io/flags/rs.svg', 'type' => 'flag'],
+            'Prva crnogorska liga' => ['url' => 'https://media.api-sports.io/flags/me.svg', 'type' => 'flag'],
+            'Premijer liga BiH' => ['url' => 'https://media.api-sports.io/flags/ba.svg', 'type' => 'flag'],
+            'HNL' => ['url' => 'https://media.api-sports.io/flags/hr.svg', 'type' => 'flag'],
+            '1. SNL' => ['url' => 'https://media.api-sports.io/flags/si.svg', 'type' => 'flag'],
+            'Prva liga Makedonije' => ['url' => 'https://media.api-sports.io/flags/mk.svg', 'type' => 'flag'],
+            'Liga prvaka' => ['url' => 'https://media.api-sports.io/football/leagues/2.png', 'type' => 'badge'],
+            'Evropska liga' => ['url' => 'https://media.api-sports.io/football/leagues/3.png', 'type' => 'badge'],
+            'Liga konferencija' => ['url' => 'https://media.api-sports.io/football/leagues/848.png', 'type' => 'badge'],
+            'Evroliga', 'Evrokup' => ['url' => 'https://media.api-sports.io/flags/eu.svg', 'type' => 'flag'],
+            default => ['url' => null, 'type' => 'flag'],
         };
     }
 

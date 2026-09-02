@@ -20,7 +20,7 @@ class BasketballMatchDetail
     {
         return [
             'league' => $fixture->league->name,
-            'flag' => Accent::leagueFlag($fixture->league->name),
+            'flag' => Accent::leagueIcon($fixture->league->name),
             'round' => $fixture->matchday,
             'home' => ['name' => $fixture->homeTeam->name, 'initials' => TeamBadge::initials($fixture->homeTeam->name), 'crest' => $fixture->homeTeam->crest_url],
             'away' => ['name' => $fixture->awayTeam->name, 'initials' => TeamBadge::initials($fixture->awayTeam->name), 'crest' => $fixture->awayTeam->crest_url],
