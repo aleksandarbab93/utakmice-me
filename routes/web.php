@@ -32,6 +32,9 @@ Route::get('/kosarka/tabele', [SportController::class, 'standings'])
     ->defaults('sport', 'kosarka')
     ->name('standings.kosarka');
 
+Route::get('/vijesti', [PostController::class, 'index'])
+    ->name('post.index');
+
 Route::get('/vijesti/{slug}', [PostController::class, 'show'])
     ->name('post.show');
 

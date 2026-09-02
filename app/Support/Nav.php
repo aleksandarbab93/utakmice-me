@@ -34,4 +34,11 @@ class Nav
     {
         return route('match.show', $fixtureId);
     }
+
+    public static function news(?string $liga = null): string
+    {
+        $url = route('post.index');
+
+        return $liga ? $url.'?liga='.$liga : $url;
+    }
 }

@@ -2,7 +2,8 @@
 
 <footer class="border-t border-white/[0.07] bg-[#0A0C0F]">
     {{-- Desktop --}}
-    <div class="hidden lg:block px-7 pt-9">
+    <div class="hidden lg:flex justify-center pt-9">
+        <div class="flex-1 max-w-[1120px] px-7">
         <div class="grid gap-8 pb-8" style="grid-template-columns:1.4fr 1fr 1fr 1fr 1fr">
             <div class="flex flex-col gap-3.5">
                 <div class="flex items-center gap-2.5">
@@ -32,9 +33,9 @@
             <div class="flex flex-col gap-3">
                 <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">SEKCIJE</span>
                 <a href="{{ \App\Support\Nav::scores($sport) }}" class="text-[13.5px] text-text-2">Utakmice</a>
-                <a href="{{ \App\Support\Nav::standings($sport) }}" class="text-[13.5px] text-text-2">Tabele</a>
-                <a href="{{ \App\Support\Nav::home($sport) }}" class="text-[13.5px] text-text-2">Vijesti</a>
-                <a href="{{ route('streams') }}" class="text-[13.5px] text-text-2">Prenosi uživo</a>
+                <a href="{{ \App\Support\Nav::news() }}" class="text-[13.5px] text-text-2">Vijesti</a>
+                <a href="{{ route('streams') }}" class="text-[13.5px] text-text-2">Prenos uživo</a>
+                <a href="{{ \App\Support\Nav::standings($sport) }}" class="text-[13.5px] text-text-2">Lige</a>
                 <span class="text-[13.5px] text-text-2">Statistika</span>
             </div>
 
@@ -57,6 +58,7 @@
                     <span class="font-mono text-[10px] tracking-[0.1em] text-text-muted">SVI SERVISI RADE</span>
                 </span>
             </div>
+        </div>
         </div>
     </div>
 

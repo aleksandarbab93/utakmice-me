@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Post;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -20,6 +21,32 @@ class PostFeed
             ->limit($limit)
             ->get()
             ->map(fn (Post $post) => self::format($post));
+    }
+
+    /** Chronological izveštaj feed for the /vijesti listing page, optionally narrowed to one league. */
+    public static function reports(?string $leagueSlug = null, string $direction = 'desc', int $perPage = 12): LengthAwarePaginator
+    {
+        return Post::where('type', 'izvestaj')
+            ->when($leagueSlug, fn ($q) => $q->whereHas('league', fn ($l) => $l->where('slug', $leagueSlug)))
+            ->with(['league', 'fixture.homeTeam', 'fixture.awayTeam'])
+            ->orderBy('published_at', $direction)
+            ->paginate($perPage)
+            ->withQueryString()
+            ->through(fn (Post $post) => self::format($post));
+    }
+
+    /** Distinct leagues with at least one izveštaj post — for the /vijesti filter chips. */
+    public static function reportLeagues(): Collection
+    {
+        return Post::where('type', 'izvestaj')
+            ->with('league')
+            ->get()
+            ->pluck('league')
+            ->filter()
+            ->unique('id')
+            ->sortBy('name')
+            ->values()
+            ->map(fn ($league) => ['name' => $league->name, 'slug' => $league->slug]);
     }
 
     public static function postBySlug(string $slug): ?array
@@ -46,9 +73,11 @@ class PostFeed
             'slug' => $post->slug,
             'type' => $post->type,
             'league' => $post->league?->name ?? 'Fudbal',
+            'league_slug' => $post->league?->slug,
             'title' => $post->title,
             'lead' => $post->lead,
             'meta' => RelativeTime::sr($post->published_at),
+            'published_at' => $post->published_at,
             'read_minutes' => max(1, (int) ceil($words / 200)),
             'author' => null,
             'body' => $post->body ?? [],

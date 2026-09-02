@@ -91,7 +91,7 @@
     </div>
 
     {{-- Desktop --}}
-    <div class="hidden lg:block max-w-[1440px] mx-auto">
+    <div class="hidden lg:block max-w-[1120px] mx-auto">
         <div class="px-7 py-5 border-b border-white/[0.07] flex flex-col gap-3.5">
             <div class="flex items-center justify-between gap-5">
                 <div class="flex items-center gap-2">

@@ -11,10 +11,10 @@
     </a>
     <a href="{{ \App\Support\Nav::standings($sport) }}" class="flex flex-col items-center gap-1.5 {{ $active === 'standings' ? $accent['text'] : 'text-text-dim' }}">
         <x-icon name="standings" class="w-5 h-5" />
-        <span class="text-[10px] {{ $active === 'standings' ? 'font-bold' : 'font-semibold' }}">Tabele</span>
+        <span class="text-[10px] {{ $active === 'standings' ? 'font-bold' : 'font-semibold' }}">Lige</span>
     </a>
-    <a href="{{ \App\Support\Nav::home($sport) }}" class="flex flex-col items-center gap-1.5 text-text-dim">
+    <a href="{{ \App\Support\Nav::news() }}" class="flex flex-col items-center gap-1.5 {{ $active === 'vijesti' ? $accent['text'] : 'text-text-dim' }}">
         <x-icon name="news" class="w-5 h-5" />
-        <span class="text-[10px] font-semibold">Vijesti</span>
+        <span class="text-[10px] {{ $active === 'vijesti' ? 'font-bold' : 'font-semibold' }}">Vijesti</span>
     </a>
 </nav>
