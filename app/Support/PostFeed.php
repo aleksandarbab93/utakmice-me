@@ -23,10 +23,16 @@ class PostFeed
             ->map(fn (Post $post) => self::format($post));
     }
 
-    /** Chronological izveštaj feed for the /vijesti listing page, optionally narrowed to one league. */
+    /**
+     * Chronological izveštaj feed for the /vijesti listing page, optionally
+     * narrowed to one league. Fudbal only — that page's chips, copy and SEO
+     * description are all written for football; košarka reports show on
+     * their own home page instead until this page is worth splitting by sport.
+     */
     public static function reports(?string $leagueSlug = null, string $direction = 'desc', int $perPage = 12): LengthAwarePaginator
     {
         return Post::where('type', 'izvestaj')
+            ->where('sport', 'fudbal')
             ->when($leagueSlug, fn ($q) => $q->whereHas('league', fn ($l) => $l->where('slug', $leagueSlug)))
             ->with(['league', 'fixture.homeTeam', 'fixture.awayTeam'])
             ->orderBy('published_at', $direction)
@@ -39,6 +45,7 @@ class PostFeed
     public static function reportLeagues(): Collection
     {
         return Post::where('type', 'izvestaj')
+            ->where('sport', 'fudbal')
             ->with('league')
             ->get()
             ->pluck('league')
@@ -72,6 +79,7 @@ class PostFeed
         return [
             'slug' => $post->slug,
             'type' => $post->type,
+            'sport' => $post->sport,
             'league' => $post->league?->name ?? 'Fudbal',
             'league_slug' => $post->league?->slug,
             'title' => $post->title,

@@ -6,7 +6,6 @@ use App\Models\Post;
 use App\Support\Accent;
 use App\Support\PostFeed;
 use App\Support\RelativeTime;
-use App\Support\SampleData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -32,7 +31,7 @@ class PostController extends Controller
             ->groupBy(fn (array $post) => self::dayLabel($post['published_at']))
             ->map(fn ($items, $label) => ['label' => $label, 'posts' => $items->values()]);
 
-        $latest = Post::where('type', 'izvestaj')->max('published_at');
+        $latest = Post::where('type', 'izvestaj')->where('sport', 'fudbal')->max('published_at');
 
         return view('posts.index', [
             'sport' => $sport,
@@ -69,21 +68,17 @@ class PostController extends Controller
     public function show(Request $request, string $slug)
     {
         $post = PostFeed::postBySlug($slug);
-        $sport = 'fudbal';
 
-        if ($post === null) {
-            $post = SampleData::postBySlug($slug);
-            abort_if($post === null, 404);
-            $sport = in_array($post['league'], Accent::leagues('kosarka'), true) ? 'kosarka' : 'fudbal';
-        }
+        abort_if($post === null, 404);
 
-        $related = $sport === 'fudbal'
-            ? PostFeed::posts($sport)->reject(fn ($p) => $p['slug'] === $post['slug'])->take(2)->values()
-            : collect(SampleData::posts($sport))->reject(fn ($p) => $p['slug'] === $post['slug'])->take(2)->values();
+        $sport = $post['sport'];
+
+        $related = PostFeed::posts($sport)->reject(fn ($p) => $p['slug'] === $post['slug'])->take(2)->values();
 
         return view('posts.show', [
             'sport' => $sport,
             'accent' => Accent::classes($sport),
+            'active' => 'vijesti',
             'post' => $post,
             'related' => $related,
         ]);

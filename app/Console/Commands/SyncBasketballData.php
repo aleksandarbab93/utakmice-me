@@ -7,6 +7,7 @@ use App\Models\League;
 use App\Models\Standing;
 use App\Models\Team;
 use App\Services\Euroleague\EuroleagueClient;
+use App\Support\BasketballReportGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -66,11 +67,13 @@ class SyncBasketballData extends Command
     {
         $games = $client->games($league->external_id, $seasonCode);
 
+        $reportsGenerated = 0;
+
         foreach ($games as $game) {
             $home = $this->upsertTeam($league, $game['local']['club']);
             $away = $this->upsertTeam($league, $game['road']['club']);
 
-            Fixture::updateOrCreate(
+            $fixture = Fixture::updateOrCreate(
                 ['external_source' => 'euroleague', 'external_id' => $game['id']],
                 [
                     'league_id' => $league->id,
@@ -85,9 +88,13 @@ class SyncBasketballData extends Command
                     'venue' => $game['venue']['name'] ?? null,
                 ],
             );
+
+            if (BasketballReportGenerator::generate($fixture, $game)) {
+                $reportsGenerated++;
+            }
         }
 
-        $this->line('  games: '.count($games).' rows');
+        $this->line('  games: '.count($games).' rows'.($reportsGenerated ? ", {$reportsGenerated} new reports" : ''));
     }
 
     private function syncStandings(EuroleagueClient $client, League $league, string $seasonCode): void

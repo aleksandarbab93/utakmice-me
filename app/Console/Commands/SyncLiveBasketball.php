@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Fixture;
 use App\Models\League;
 use App\Services\Euroleague\EuroleagueClient;
+use App\Support\BasketballReportGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -99,6 +100,7 @@ class SyncLiveBasketball extends Command
                 continue;
             }
 
+            $wasFinished = $fixture->status === 'finished';
             $fixture->status = $this->matchStatus($game);
             $fixture->home_score = $game['local']['score'] ?: null;
             $fixture->away_score = $game['road']['score'] ?: null;
@@ -109,6 +111,10 @@ class SyncLiveBasketball extends Command
 
             $fixture->save();
             $updated++;
+
+            if (! $wasFinished && $fixture->status === 'finished') {
+                BasketballReportGenerator::generate($fixture, $game);
+            }
         }
 
         return $updated;

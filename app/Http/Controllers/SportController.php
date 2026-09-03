@@ -6,7 +6,6 @@ use App\Support\Accent;
 use App\Support\BasketballFeed;
 use App\Support\FootballFeed;
 use App\Support\PostFeed;
-use App\Support\SampleData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -23,12 +22,11 @@ class SportController extends Controller
         }
 
         $liveTabs = $sport === 'fudbal' ? FootballFeed::homeLive() : BasketballFeed::homeLive();
-        $posts = $sport === 'fudbal' ? PostFeed::posts($sport)->all() : SampleData::posts($sport);
+        $posts = PostFeed::posts($sport)->all();
         $hero = array_shift($posts);
         $secondary = array_splice($posts, 0, 2);
         $latest = collect($posts)->take(4);
         $mostRead = collect(array_merge([$hero], $secondary))->filter()->take(3)->values();
-        $standings = $sport === 'fudbal' ? FootballFeed::standings() : BasketballFeed::standings();
 
         // Basketball's new season doesn't start for a while — while uživo/danas/sutra
         // are all empty, feature the opening round's schedule instead of nothing.
@@ -49,8 +47,6 @@ class SportController extends Controller
             'secondary' => $secondary,
             'latest' => $latest,
             'mostRead' => $mostRead,
-            'miniStandings' => array_slice($standings['rows'], 0, 3),
-            'standingsCompetition' => $standings['competition'],
         ]);
     }
 
@@ -84,6 +80,9 @@ class SportController extends Controller
             'dateLabel' => FootballFeed::dayLabel($date),
             'prevDate' => $date->copy()->subDay()->format('Y-m-d'),
             'nextDate' => $date->copy()->addDay()->format('Y-m-d'),
+            'description' => $sport === 'kosarka'
+                ? 'Rezultati košarkaških utakmica uživo — Evroliga i Evrokup. Tekući rezultati, raniji i budući mečevi.'
+                : 'Rezultati fudbalskih utakmica uživo — Premijer liga, La Liga, Serie A, Bundesliga, Ligue 1, Liga prvaka i regionalne lige. Tekući rezultati, raniji i budući mečevi.',
         ]);
     }
 
