@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Fixture extends Model
@@ -38,6 +39,16 @@ class Fixture extends Model
     public function streams(): HasMany
     {
         return $this->hasMany(FixtureStream::class);
+    }
+
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    public function pushSubscriptions(): BelongsToMany
+    {
+        return $this->belongsToMany(PushSubscription::class, 'push_subscription_fixture');
     }
 
     public function isLive(): bool

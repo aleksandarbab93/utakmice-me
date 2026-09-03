@@ -67,6 +67,29 @@ class Accent
     }
 
     /**
+     * The country a domestic league plays in — for grouping the /lige
+     * catalog. Continental club competitions (and Evroliga/Evrokup) have
+     * no single country and group under "Evropska takmičenja" instead.
+     */
+    public static function leagueCountry(string $leagueName): ?string
+    {
+        return match ($leagueName) {
+            'Premijer liga' => 'Engleska',
+            'La Liga' => 'Španija',
+            'Serie A' => 'Italija',
+            'Bundesliga' => 'Njemačka',
+            'Ligue 1' => 'Francuska',
+            'Superliga Srbije' => 'Srbija',
+            'Prva crnogorska liga' => 'Crna Gora',
+            'Premijer liga BiH' => 'Bosna i Hercegovina',
+            'HNL' => 'Hrvatska',
+            '1. SNL' => 'Slovenija',
+            'Prva liga Makedonije' => 'Sjeverna Makedonija',
+            default => null,
+        };
+    }
+
+    /**
      * Table positions that qualify for Europe (Liga prvaka / Evropska liga)
      * and that mean relegation, per league. Positions are 1-based table
      * ranks, counted from the bottom for relegation.

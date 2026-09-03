@@ -41,4 +41,44 @@ class Nav
 
         return $liga ? $url.'?liga='.$liga : $url;
     }
+
+    public static function leagues(): string
+    {
+        return route('leagues');
+    }
+
+    public static function league(string $slug): string
+    {
+        return route('league.show', $slug);
+    }
+
+    public static function leagueResults(string $slug): string
+    {
+        return route('league.results', $slug);
+    }
+
+    public static function leagueFixtures(string $slug): string
+    {
+        return route('league.fixtures', $slug);
+    }
+
+    public static function about(): string
+    {
+        return route('page.about');
+    }
+
+    public static function contact(): string
+    {
+        return route('page.contact');
+    }
+
+    public static function privacy(): string
+    {
+        return route('page.privacy');
+    }
+
+    public static function advertising(): string
+    {
+        return route('page.advertising');
+    }
 }

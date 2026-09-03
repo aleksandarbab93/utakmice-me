@@ -143,6 +143,7 @@ class FootballFeed
                     default => null,
                 },
                 'form' => self::teamForm($s->team_id, $league->id),
+                'next' => self::nextMatchTooltip($s->team_id, $league->id),
             ])
             ->all();
 
@@ -164,12 +165,17 @@ class FootballFeed
         ];
     }
 
-    /** A team's last 5 finished league matches (oldest first) as W/D/L letters. */
+    /**
+     * A team's last 5 finished league matches (oldest first) — the W/D/L
+     * result plus a tooltip naming the actual match, for the FORMA column's
+     * hover popup.
+     */
     private static function teamForm(int $teamId, int $leagueId): array
     {
         return Fixture::where('league_id', $leagueId)
             ->where('status', 'finished')
             ->where(fn ($q) => $q->where('home_team_id', $teamId)->orWhere('away_team_id', $teamId))
+            ->with(['homeTeam', 'awayTeam'])
             ->orderByDesc('kickoff_at')
             ->limit(5)
             ->get()
@@ -180,8 +186,28 @@ class FootballFeed
                 $for = $isHome ? $f->home_score : $f->away_score;
                 $against = $isHome ? $f->away_score : $f->home_score;
 
-                return $for > $against ? 'W' : ($for < $against ? 'L' : 'D');
+                return [
+                    'result' => $for > $against ? 'W' : ($for < $against ? 'L' : 'D'),
+                    'tooltip' => "{$f->home_score}:{$f->away_score} ({$f->homeTeam->name} - {$f->awayTeam->name})\n".$f->kickoff_at->format('d.m.Y.'),
+                ];
             })
             ->all();
+    }
+
+    /** A team's next scheduled league fixture, as a tooltip for the FORMA column's leading "?" badge. */
+    private static function nextMatchTooltip(int $teamId, int $leagueId): ?string
+    {
+        $fixture = Fixture::where('league_id', $leagueId)
+            ->where('status', 'scheduled')
+            ->where(fn ($q) => $q->where('home_team_id', $teamId)->orWhere('away_team_id', $teamId))
+            ->with(['homeTeam', 'awayTeam'])
+            ->orderBy('kickoff_at')
+            ->first();
+
+        if (! $fixture) {
+            return null;
+        }
+
+        return "Sljedeća utakmica:\n{$fixture->homeTeam->name} - {$fixture->awayTeam->name}\n".$fixture->kickoff_at->format('d.m.Y.');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Fixture;
+use App\Models\Goal;
 use App\Models\Post;
 use App\Services\SStats\SStatsClient;
 use Illuminate\Support\Carbon;
@@ -73,7 +74,7 @@ class MatchReportGenerator
                 ? "{$away} je slavio na gostovanju kod {$home}, meč u okviru {$league} završen je rezultatom {$hs}:{$as}."
                 : "{$home} i {$away} podijelili su bodove, meč u okviru {$league} završen je rezultatom {$hs}:{$as}.");
 
-        return Post::create([
+        $post = Post::create([
             'type' => 'izvestaj',
             'sport' => 'fudbal',
             'slug' => $slug,
@@ -84,6 +85,33 @@ class MatchReportGenerator
             'fixture_id' => $fixture->id,
             'published_at' => self::estimatedFullTime($fixture),
         ]);
+
+        self::persistGoals($goals, $fixture);
+
+        return $post;
+    }
+
+    /**
+     * One row per goal, credited to the scoring team (an own goal credits
+     * the opponent) — feeds the league page's "Najbolji strijelci" list.
+     * Free: it reuses the event data already fetched for the report.
+     */
+    private static function persistGoals(\Illuminate\Support\Collection $goals, Fixture $fixture): void
+    {
+        foreach ($goals as $g) {
+            $isOwnGoal = $g['icon'] === 'og';
+            $creditSide = $isOwnGoal ? ($g['side'] === 'home' ? 'away' : 'home') : $g['side'];
+
+            Goal::create([
+                'fixture_id' => $fixture->id,
+                'league_id' => $fixture->league_id,
+                'team_id' => $creditSide === 'home' ? $fixture->home_team_id : $fixture->away_team_id,
+                'player_name' => $g['player'],
+                'minute' => $g['elapsed'],
+                'is_penalty' => $g['subtitle'] === 'Penal',
+                'is_own_goal' => $isOwnGoal,
+            ]);
+        }
     }
 
     /**
