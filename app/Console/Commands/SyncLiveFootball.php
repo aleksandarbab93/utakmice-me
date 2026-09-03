@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Fixture;
 use App\Services\SStats\SStatsClient;
+use App\Support\GoalPush;
 use App\Support\MatchReportGenerator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -99,6 +100,7 @@ class SyncLiveFootball extends Command
 
             $wasFinished = $fixture->status === 'finished';
             $status = SStatsClient::mapStatus($game['status']);
+            $before = [$fixture->home_score, $fixture->away_score];
 
             $fixture->status = $status;
             $fixture->home_score = $game['homeResult'];
@@ -111,6 +113,8 @@ class SyncLiveFootball extends Command
 
             $fixture->save();
             $updated++;
+
+            GoalPush::maybe($fixture, $before);
 
             if (! $wasFinished && $status === 'finished') {
                 $this->onMatchFinished($fixture, $client);
@@ -152,6 +156,7 @@ class SyncLiveFootball extends Command
             }
 
             $status = SStatsClient::mapStatus($game['status']);
+            $before = [$fixture->home_score, $fixture->away_score];
             $fixture->status = $status;
             $fixture->home_score = $game['homeResult'];
             $fixture->away_score = $game['awayResult'];
@@ -163,6 +168,8 @@ class SyncLiveFootball extends Command
 
             $fixture->save();
             $settled++;
+
+            GoalPush::maybe($fixture, $before);
 
             if ($status === 'finished') {
                 $this->onMatchFinished($fixture, $client);

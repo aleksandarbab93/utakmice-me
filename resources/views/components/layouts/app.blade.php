@@ -19,7 +19,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 </head>
-<body class="bg-bg text-text font-sans antialiased">
+<body class="bg-bg text-text font-sans antialiased" data-push="{{ \App\Support\WebPush::configured() ? '1' : '0' }}">
     <div class="min-h-screen flex flex-col">
         <x-site-header :sport="$sport" :accent="$accent" :active="$active" />
 
@@ -29,7 +29,9 @@
 
         <x-site-footer :sport="$sport" :accent="$accent" />
 
-        <x-tab-bar :sport="$sport" :accent="$accent" :active="$active" />
+        @if ($active === 'scores')
+            <x-tab-bar :sport="$sport" :accent="$accent" />
+        @endif
     </div>
 </body>
 </html>

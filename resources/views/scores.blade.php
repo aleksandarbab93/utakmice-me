@@ -1,4 +1,4 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Rezultati — Utakmice.me'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Rezultati — Utakmice.me'" :description="$description">
     <div class="max-w-[1120px] mx-auto lg:px-7 lg:py-6">
         <div class="lg:grid lg:gap-7" style="grid-template-columns: 220px 1fr">
 
@@ -12,19 +12,28 @@
                                 <x-league-icon :icon="\App\Support\Accent::leagueIcon($league['name'])" class="w-4 h-3" />
                                 <span class="truncate">{{ $league['name'] }}</span>
                             </a>
-                            <a href="{{ \App\Support\Nav::standings($sport, $league['slug']) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela</a>
+                            <a href="{{ \App\Support\Nav::league($league['slug']) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela</a>
                         </div>
                     @endforeach
                 </div>
             </aside>
 
             <div class="px-4 lg:px-0 pt-3 lg:pt-0">
+                {{-- Page head --}}
+                <div class="flex items-start gap-2.5 lg:gap-3 mb-4 lg:mb-5">
+                    <span class="flex-none w-1 h-6 lg:h-8 rounded-[2px] {{ $accent['bg'] }} mt-0.5"></span>
+                    <div class="flex flex-col gap-1.5 lg:gap-2">
+                        <h1 class="text-2xl lg:text-[32px] font-extrabold tracking-tight leading-none">Utakmice</h1>
+                        <p class="text-[13.5px] lg:text-[15px] leading-relaxed text-text-muted max-w-[62ch]">{{ $description }}</p>
+                    </div>
+                </div>
+
                 {{-- Tabs + date nav --}}
                 <div class="flex items-center justify-between gap-3 flex-wrap">
-                    <div class="flex gap-2" id="score-tabs">
-                        <button data-tab="sve" class="tab-btn is-active-tab h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-white/[0.1]" style="height:34px">SVE</button>
-                        <button data-tab="uzivo" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">UŽIVO</button>
-                        <button data-tab="favorizovani" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">FAVORIZOVANI</button>
+                    <div class="hidden lg:flex gap-2" id="score-tabs">
+                        <button data-tab="sve" data-active-class="bg-white/[0.1]" data-inactive-class="bg-surface border border-white/[0.08] text-text-muted" class="tab-btn is-active-tab h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-white/[0.1]" style="height:34px">SVE</button>
+                        <button data-tab="uzivo" data-active-class="bg-white/[0.1]" data-inactive-class="bg-surface border border-white/[0.08] text-text-muted" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">UŽIVO</button>
+                        <button data-tab="favorizovani" data-active-class="bg-white/[0.1]" data-inactive-class="bg-surface border border-white/[0.08] text-text-muted" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">FAVORIZOVANI</button>
                     </div>
                     <div class="flex items-center justify-between gap-3 w-full lg:w-auto lg:justify-start lg:gap-2">
                         <a href="{{ \App\Support\Nav::scores($sport, $prevDate) }}" class="w-8.5 h-8.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted flex-none" style="width:34px;height:34px">
@@ -48,7 +57,7 @@
                                     <span class="font-mono text-[10px] font-bold tracking-[0.16em] text-text-2 truncate">{{ strtoupper($group['name']) }}</span>
                                     <svg data-chevron width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-text-dim transition-transform"><path d="M6 9l6 6 6-6"/></svg>
                                 </button>
-                                <a href="{{ \App\Support\Nav::standings($sport, $group['slug']) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela &rsaquo;</a>
+                                <a href="{{ \App\Support\Nav::league($group['slug']) }}" class="font-mono text-[9.5px] tracking-[0.05em] text-text-dim flex-none">Tabela &rsaquo;</a>
                             </div>
                             <div data-league-body class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
                                 @foreach ($group['matches'] as $m)
@@ -122,7 +131,7 @@
     </div>
 
     <script>
-        (function () {
+        document.addEventListener('DOMContentLoaded', function () {
             const FAV_KEY = 'utakmice_favorites';
             const getFavs = () => { try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch (e) { return []; } };
             const setFavs = (arr) => { try { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); } catch (e) {} };
@@ -145,6 +154,7 @@
                     setFavs([...favs]);
                     paintStar(btn, favs.has(id));
                     applyFilter();
+                    document.dispatchEvent(new CustomEvent('utakmice:favorites-changed'));
                 });
             });
 
@@ -172,11 +182,15 @@
                 btn.addEventListener('click', () => {
                     activeTab = btn.dataset.tab;
                     document.querySelectorAll('.tab-btn').forEach((b) => {
-                        b.classList.remove('is-active-tab', 'bg-white/[0.1]');
-                        b.classList.add('bg-surface', 'border', 'border-white/[0.08]', 'text-text-muted');
+                        const isActive = b.dataset.tab === activeTab;
+                        const activeClasses = (b.dataset.activeClass || '').split(' ').filter(Boolean);
+                        const inactiveClasses = (b.dataset.inactiveClass || '').split(' ').filter(Boolean);
+
+                        b.classList.toggle('is-active-tab', isActive);
+                        if (activeClasses.length) b.classList.remove(...activeClasses);
+                        if (inactiveClasses.length) b.classList.remove(...inactiveClasses);
+                        b.classList.add(...(isActive ? activeClasses : inactiveClasses));
                     });
-                    btn.classList.add('is-active-tab', 'bg-white/[0.1]');
-                    btn.classList.remove('bg-surface', 'border', 'border-white/[0.08]', 'text-text-muted');
                     applyFilter();
                 });
             });
@@ -192,6 +206,6 @@
             });
 
             applyFilter();
-        })();
+        });
     </script>
 </x-layouts.app>

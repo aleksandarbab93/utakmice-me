@@ -40,6 +40,15 @@ return [
         'base_url' => env('SSTATS_BASE_URL', 'https://api.sstats.net'),
     ],
 
+    'webpush' => [
+        'public_key' => env('VAPID_PUBLIC_KEY'),
+        'private_key' => env('VAPID_PRIVATE_KEY'),
+        'subject' => env('VAPID_SUBJECT', 'mailto:podrska@utakmice.me'),
+        // A goal is news while the match is on — a phone that was off for two
+        // hours shouldn't hear about one from a match that's since finished.
+        'ttl' => (int) env('VAPID_TTL', 1800),
+    ],
+
     'youtube' => [
         // No key needed — the channel feed and oEmbed are both public and
         // free. Set YOUTUBE_API_KEY to also learn whether a video is live

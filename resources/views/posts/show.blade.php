@@ -4,17 +4,12 @@
     $author = $post['author'] ?? 'Redakcija';
 @endphp
 
-<x-layouts.minimal :title="$post['title'].' — Utakmice.me'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$post['title'].' — Utakmice.me'" :description="$post['lead']">
 
     {{-- Mobile --}}
-    <div class="lg:hidden flex flex-col min-h-screen">
-        <div class="h-14 flex items-center justify-between px-4 border-b border-white/[0.07]">
-            <div class="flex items-center gap-3">
-                <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
-                    <x-icon name="back" class="w-3.5 h-3.5" />
-                </a>
-                <span class="font-mono text-[10px] tracking-[0.14em] {{ $accent['text'] }}">{{ strtoupper($post['league']) }}</span>
-            </div>
+    <div class="lg:hidden flex flex-col">
+        <div class="px-4 pt-3.5 flex items-center justify-between">
+            <span class="font-mono text-[10px] tracking-[0.14em] {{ $accent['text'] }}">{{ strtoupper($post['league']) }}</span>
             <div class="flex gap-2">
                 <button class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted"><x-icon name="star" class="w-3.5 h-3.5" /></button>
                 <button class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted"><x-icon name="share" class="w-3.5 h-3.5" /></button>
@@ -147,4 +142,4 @@
             </div>
         </div>
     </div>
-</x-layouts.minimal>
+</x-layouts.app>

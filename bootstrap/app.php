@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Plain fetch() from the service-worker push toggle doesn't carry a
+        // CSRF token, and doesn't need to: these endpoints identify a
+        // browser by its push subscription, not by session.
+        $middleware->validateCsrfTokens(except: ['api/push/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -5,43 +5,22 @@
 @endphp
 
 <header class="border-b border-white/[0.07]">
-    {{-- Mobile top bar --}}
+    {{-- Mobile top bar: logo + hamburger, always — the page's own heading lives in its content, not here. --}}
     <div class="lg:hidden h-14 flex items-center justify-between px-4">
-        @if ($active === 'home')
-            <a href="{{ \App\Support\Nav::home($sport) }}" class="flex items-center gap-2">
-                <x-logo />
-            </a>
-            <button class="w-9 h-9 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
-                <x-icon name="search" class="w-4 h-4" />
-            </button>
-        @elseif ($active === 'scores')
-            <span class="text-xl font-extrabold tracking-tight">Utakmice</span>
+        <a href="{{ \App\Support\Nav::home($sport) }}" class="flex items-center gap-2">
+            <x-logo />
+        </a>
+        <div class="flex items-center gap-2">
+            @if ($active === 'home')
+                <button class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
+                    <x-icon name="search" class="w-3.5 h-3.5" />
+                </button>
+            @endif
             <x-mobile-nav-drawer :sport="$sport" />
-        @elseif ($active === 'vijesti')
-            <div class="flex items-center gap-3">
-                <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
-                    <x-icon name="back" class="w-3.5 h-3.5" />
-                </a>
-                <span class="text-xl font-extrabold tracking-tight">Vijesti</span>
-            </div>
-        @elseif ($active === 'streams')
-            <div class="flex items-center gap-3">
-                <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
-                    <x-icon name="back" class="w-3.5 h-3.5" />
-                </a>
-                <span class="text-xl font-extrabold tracking-tight">Prenosi uživo</span>
-            </div>
-        @else
-            <div class="flex items-center gap-3">
-                <a href="{{ \App\Support\Nav::home($sport) }}" class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
-                    <x-icon name="back" class="w-3.5 h-3.5" />
-                </a>
-                <span class="text-xl font-extrabold tracking-tight">Tabele</span>
-            </div>
-        @endif
+        </div>
     </div>
 
-    @if (! in_array($active, ['standings', 'streams'], true))
+    @if (! in_array($active, ['standings', 'streams', 'leagues', 'league'], true))
         <div class="lg:hidden px-4 pb-3 flex gap-1.5">
             <a href="{{ $active === 'scores' ? \App\Support\Nav::scores('fudbal') : \App\Support\Nav::home('fudbal') }}"
                class="flex-1 h-10 rounded-[10px] flex items-center justify-center text-sm font-bold {{ $sport === 'fudbal' ? 'bg-accent text-bg' : 'bg-surface border border-white/[0.08] text-text-muted font-semibold' }}">
@@ -68,18 +47,24 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-live animate-live"></span>
                         Prenos uživo
                     </a>
-                    <a href="{{ \App\Support\Nav::standings($sport) }}" class="{{ $active === 'standings' ? 'text-accent font-semibold' : '' }}">Lige</a>
+                    <a href="{{ \App\Support\Nav::leagues() }}" class="{{ in_array($active, ['leagues', 'league', 'standings'], true) ? 'text-accent font-semibold' : '' }}">Lige</a>
                 </nav>
             </div>
-            <div class="w-64 h-9 rounded-full bg-surface border border-white/[0.08] flex items-center gap-2 px-3.5 text-text-dim text-[13px]">
-                <x-icon name="search" class="w-3.5 h-3.5" />
-                <span>Pretraga klubova i vijesti</span>
+            <div class="flex items-center gap-3">
+                <div class="w-64 h-9 rounded-full bg-surface border border-white/[0.08] flex items-center gap-2 px-3.5 text-text-dim text-[13px]">
+                    <x-icon name="search" class="w-3.5 h-3.5" />
+                    <span>Pretraga klubova i vijesti</span>
+                </div>
+                <button type="button" hidden data-push-toggle aria-pressed="false"
+                        class="w-9 h-9 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-dim flex-none">
+                    <x-icon name="bell" class="w-4 h-4" />
+                </button>
             </div>
         </div>
     </div>
 
     {{-- Sport switcher row --}}
-    @if ($active !== 'streams')
+    @if (! in_array($active, ['streams', 'leagues', 'league'], true))
     <div class="hidden lg:flex justify-center border-t border-white/[0.07]">
         <div class="flex-1 max-w-[1120px] flex items-center px-7 py-3">
             <div class="flex gap-1 bg-surface border border-white/[0.08] rounded-[10px] p-1">
