@@ -44,6 +44,17 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
+        // Read-only source for `php artisan db:transfer` — the local SQLite
+        // file, uploaded next to the app once, so the site can open with the
+        // archive already in it instead of rebuilding it from scratch on the
+        // server. Only exists when IMPORT_SQLITE_PATH is set; see deploy notes.
+        'sqlite_import' => [
+            'driver' => 'sqlite',
+            'database' => env('IMPORT_SQLITE_PATH', ''),
+            'prefix' => '',
+            'foreign_key_constraints' => false,
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
