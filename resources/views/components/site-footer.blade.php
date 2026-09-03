@@ -17,35 +17,34 @@
 
             <div class="flex flex-col gap-3">
                 <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">FUDBAL</span>
-                @foreach (\App\Support\Accent::leagues('fudbal') as $league)
-                    <a href="{{ \App\Support\Nav::home('fudbal') }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
+                @foreach (collect(\App\Support\Accent::leagues('fudbal'))->take(5) as $league)
+                    <a href="{{ \App\Support\Nav::league(\Illuminate\Support\Str::slug($league)) }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
                 @endforeach
             </div>
 
             <div class="flex flex-col gap-3">
                 <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">KOŠARKA</span>
                 @foreach (\App\Support\Accent::leagues('kosarka') as $league)
-                    <a href="{{ \App\Support\Nav::home('kosarka') }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
+                    <a href="{{ \App\Support\Nav::league(\Illuminate\Support\Str::slug($league)) }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
                 @endforeach
                 <a href="{{ \App\Support\Nav::standings('kosarka') }}" class="text-[13.5px] text-text-2">Tabele takmičenja</a>
             </div>
 
             <div class="flex flex-col gap-3">
-                <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">SEKCIJE</span>
+                <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">SAJT</span>
                 <a href="{{ \App\Support\Nav::scores($sport) }}" class="text-[13.5px] text-text-2">Utakmice</a>
                 <a href="{{ \App\Support\Nav::news() }}" class="text-[13.5px] text-text-2">Vijesti</a>
                 <a href="{{ route('streams') }}" class="text-[13.5px] text-text-2">Prenos uživo</a>
-                <a href="{{ \App\Support\Nav::standings($sport) }}" class="text-[13.5px] text-text-2">Lige</a>
-                <span class="text-[13.5px] text-text-2">Statistika</span>
+                <a href="{{ \App\Support\Nav::leagues() }}" class="text-[13.5px] text-text-2">Lige</a>
+                <a href="{{ \App\Support\Nav::about() }}" class="text-[13.5px] text-text-2">O nama</a>
+                <a href="{{ \App\Support\Nav::contact() }}" class="text-[13.5px] text-text-2">Kontakt</a>
+                <span class="text-[13.5px] text-text-2">Kolačići</span>
             </div>
 
             <div class="flex flex-col gap-3">
-                <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">O SAJTU</span>
-                <span class="text-[13.5px] text-text-2">O nama</span>
-                <span class="text-[13.5px] text-text-2">Kontakt</span>
-                <span class="text-[13.5px] text-text-2">Marketing</span>
-                <span class="text-[13.5px] text-text-2">Uslovi korišćenja</span>
-                <span class="text-[13.5px] text-text-2">Politika privatnosti</span>
+                <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">PRAVNO</span>
+                <a href="{{ \App\Support\Nav::privacy() }}" class="text-[13.5px] text-text-2">Privatnost</a>
+                <a href="{{ \App\Support\Nav::advertising() }}" class="text-[13.5px] text-text-2">Oglašavanje</a>
             </div>
         </div>
 
@@ -74,14 +73,14 @@
         <div class="grid grid-cols-2 gap-5">
             <div class="flex flex-col gap-2.5">
                 <span class="font-mono text-[9px] font-bold tracking-[0.16em] text-text-dim">FUDBAL</span>
-                @foreach (\App\Support\Accent::leagues('fudbal') as $league)
-                    <a href="{{ \App\Support\Nav::home('fudbal') }}" class="text-[13px] text-text-2">{{ $league }}</a>
+                @foreach (collect(\App\Support\Accent::leagues('fudbal'))->take(5) as $league)
+                    <a href="{{ \App\Support\Nav::league(\Illuminate\Support\Str::slug($league)) }}" class="text-[13px] text-text-2">{{ $league }}</a>
                 @endforeach
             </div>
             <div class="flex flex-col gap-2.5">
                 <span class="font-mono text-[9px] font-bold tracking-[0.16em] text-text-dim">KOŠARKA</span>
                 @foreach (\App\Support\Accent::leagues('kosarka') as $league)
-                    <a href="{{ \App\Support\Nav::home('kosarka') }}" class="text-[13px] text-text-2">{{ $league }}</a>
+                    <a href="{{ \App\Support\Nav::league(\Illuminate\Support\Str::slug($league)) }}" class="text-[13px] text-text-2">{{ $league }}</a>
                 @endforeach
                 <a href="{{ \App\Support\Nav::standings('kosarka') }}" class="text-[13px] text-text-2">Tabele</a>
             </div>
@@ -93,9 +92,9 @@
 
         <div class="flex flex-col gap-2 pt-3 border-t border-white/[0.07]">
             <div class="flex gap-3.5 pt-1">
-                <span class="text-[12.5px] text-text-muted">Uslovi</span>
-                <span class="text-[12.5px] text-text-muted">Privatnost</span>
-                <span class="text-[12.5px] text-text-muted">Kontakt</span>
+                <a href="{{ \App\Support\Nav::privacy() }}" class="text-[12.5px] text-text-muted">Privatnost</a>
+                <a href="{{ \App\Support\Nav::advertising() }}" class="text-[12.5px] text-text-muted">Oglašavanje</a>
+                <a href="{{ \App\Support\Nav::contact() }}" class="text-[12.5px] text-text-muted">Kontakt</a>
             </div>
             <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">© 2026 UTAKMICE.ME &middot; OSVEŽAVANJE 30 S</span>
         </div>

@@ -80,13 +80,19 @@
                 <span class="w-[3px] h-3.5 rounded {{ $accent['bg'] }}"></span>
                 <span class="font-mono text-[10px] font-bold tracking-[0.16em] text-text-2">IZDVOJENO</span>
             </div>
-            <x-hero-post :post="$hero" :accent="$accent" />
-            @foreach ($secondary as $post)
-                <x-post-list-item :post="$post" />
-            @endforeach
-            @foreach ($latest as $post)
-                <x-post-list-item :post="$post" />
-            @endforeach
+            @if ($hero)
+                <x-hero-post :post="$hero" :accent="$accent" />
+                @foreach ($secondary as $post)
+                    <x-post-list-item :post="$post" />
+                @endforeach
+                @foreach ($latest as $post)
+                    <x-post-list-item :post="$post" />
+                @endforeach
+            @else
+                <div class="border border-dashed border-white/[0.12] rounded-2xl p-5 text-center text-text-muted text-sm">
+                    Još nema izveštaja sa mečeva — prvi stiže čim se odigra prvi meč.
+                </div>
+            @endif
         </div>
     </div>
 
@@ -174,59 +180,55 @@
                     <a href="{{ \App\Support\Nav::home($sport) }}" class="font-mono text-[10px] tracking-[0.12em] text-text-muted">ARHIVA &rsaquo;</a>
                 </div>
 
-                <div class="grid gap-4" style="grid-template-columns:1.35fr 1fr">
-                    <a href="{{ route('post.show', $hero['slug']) }}" class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden flex flex-col">
-                        <div class="p-5.5 flex flex-col gap-3">
-                            <span class="self-start font-mono text-[9.5px] font-bold tracking-[0.12em] px-2.5 py-1 rounded {{ $accent['tint'] }} {{ $accent['text'] }}">GLAVNA VIJEST</span>
-                            <h1 class="text-[30px] font-extrabold leading-tight tracking-tight text-balance">{{ $hero['title'] }}</h1>
-                            <p class="text-[15.5px] leading-relaxed text-text-muted">{{ $hero['lead'] }}</p>
-                            <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">{{ strtoupper($hero['meta']) }} &middot; {{ $hero['read_minutes'] }} MIN ČITANJA</span>
-                        </div>
-                    </a>
-
-                    <div class="flex flex-col gap-4">
-                        @foreach ($secondary as $post)
-                            <a href="{{ route('post.show', $post['slug']) }}" class="flex-1 bg-surface border border-white/[0.07] rounded-2xl overflow-hidden flex flex-col">
-                                <div class="p-4 flex flex-col gap-2">
-                                    <span class="font-mono text-[9px] tracking-[0.12em] {{ $accent['text'] }}">{{ strtoupper($post['league']) }}</span>
-                                    <span class="text-[17px] font-bold leading-snug tracking-tight">{{ $post['title'] }}</span>
-                                    <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">{{ strtoupper($post['meta']) }}</span>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-
-                <div class="h-px bg-white/[0.07]"></div>
-
-                <div class="flex items-center gap-2.5">
-                    <span class="w-[3px] h-3.5 rounded {{ $accent['bg'] }}"></span>
-                    <span class="font-mono text-[10.5px] font-bold tracking-[0.16em] text-text-2">NAJNOVIJE</span>
-                </div>
-                <div class="grid grid-cols-2 gap-x-7 gap-y-4">
-                    @foreach ($latest as $post)
-                        <a href="{{ route('post.show', $post['slug']) }}" class="flex flex-col gap-1.5">
-                            <span class="text-[15px] font-bold leading-snug">{{ $post['title'] }}</span>
-                            <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">{{ strtoupper($post['meta']) }} &middot; {{ strtoupper($post['league']) }}</span>
+                @if ($hero)
+                    <div class="grid gap-4" style="grid-template-columns:1.35fr 1fr">
+                        <a href="{{ route('post.show', $hero['slug']) }}" class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden flex flex-col">
+                            <div class="p-5.5 flex flex-col gap-3">
+                                <span class="self-start font-mono text-[9.5px] font-bold tracking-[0.12em] px-2.5 py-1 rounded {{ $accent['tint'] }} {{ $accent['text'] }}">GLAVNA VIJEST</span>
+                                <h1 class="text-[30px] font-extrabold leading-tight tracking-tight text-balance">{{ $hero['title'] }}</h1>
+                                <p class="text-[15.5px] leading-relaxed text-text-muted">{{ $hero['lead'] }}</p>
+                                <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">{{ strtoupper($hero['meta']) }} &middot; {{ $hero['read_minutes'] }} MIN ČITANJA</span>
+                            </div>
                         </a>
-                    @endforeach
-                </div>
+
+                        <div class="flex flex-col gap-4">
+                            @foreach ($secondary as $post)
+                                <a href="{{ route('post.show', $post['slug']) }}" class="flex-1 bg-surface border border-white/[0.07] rounded-2xl overflow-hidden flex flex-col">
+                                    <div class="p-4 flex flex-col gap-2">
+                                        <span class="font-mono text-[9px] tracking-[0.12em] {{ $accent['text'] }}">{{ strtoupper($post['league']) }}</span>
+                                        <span class="text-[17px] font-bold leading-snug tracking-tight">{{ $post['title'] }}</span>
+                                        <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">{{ strtoupper($post['meta']) }}</span>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    @if ($latest->isNotEmpty())
+                        <div class="h-px bg-white/[0.07]"></div>
+
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-[3px] h-3.5 rounded {{ $accent['bg'] }}"></span>
+                            <span class="font-mono text-[10.5px] font-bold tracking-[0.16em] text-text-2">NAJNOVIJE</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-7 gap-y-4">
+                            @foreach ($latest as $post)
+                                <a href="{{ route('post.show', $post['slug']) }}" class="flex flex-col gap-1.5">
+                                    <span class="text-[15px] font-bold leading-snug">{{ $post['title'] }}</span>
+                                    <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">{{ strtoupper($post['meta']) }} &middot; {{ strtoupper($post['league']) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+                @else
+                    <div class="border border-dashed border-white/[0.12] rounded-2xl p-6 text-center text-text-muted text-sm">
+                        Još nema izveštaja sa mečeva — prvi stiže čim se odigra prvi meč.
+                    </div>
+                @endif
             </div>
 
             <div class="flex flex-col gap-3.5">
-                <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
-                    <div class="px-3.5 py-3 border-b border-white/[0.07] flex justify-between items-center">
-                        <span class="font-mono text-[10px] font-bold tracking-[0.14em] text-text-2">TABELA</span>
-                        <a href="{{ \App\Support\Nav::standings($sport) }}" class="font-mono text-[9.5px] tracking-[0.1em] text-text-muted">CELA &rsaquo;</a>
-                    </div>
-                    @foreach ($miniStandings as $row)
-                        <div class="px-3.5 py-2.5 flex justify-between {{ !$loop->last ? 'border-b border-white/[0.05]' : '' }}">
-                            <span class="text-[13.5px] {{ $row['pos'] === 1 ? 'font-bold' : '' }}"><span class="font-mono mr-2.5 {{ $row['pos'] === 1 ? $accent['text'] : 'text-text-muted' }}">{{ $row['pos'] }}</span>{{ $row['team'] }}</span>
-                            <span class="font-mono text-[12.5px] font-bold">{{ $row['points'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-
+                @if ($mostRead->isNotEmpty())
                 <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
                     <div class="px-3.5 py-3 border-b border-white/[0.07] font-mono text-[10px] font-bold tracking-[0.14em] text-text-2">NAJČITANIJE DANAS</div>
                     @foreach ($mostRead as $post)
@@ -236,13 +238,7 @@
                         </a>
                     @endforeach
                 </div>
-
-                <div class="border border-dashed border-white/[0.12] rounded-2xl p-4 flex flex-col gap-2.5">
-                    <span class="font-mono text-[9px] tracking-[0.14em] text-text-dim">NEWSLETTER</span>
-                    <span class="text-[15px] font-bold leading-snug">Rezultati dana u tvoj inbox, svako jutro u 8</span>
-                    <span class="h-10 rounded-full bg-surface border border-white/[0.1] flex items-center px-3.5 text-text-dim text-[13px]">tvoj@email.com</span>
-                    <span class="h-10 rounded-full bg-text text-bg flex items-center justify-center text-[13.5px] font-bold">Prijavi se</span>
-                </div>
+                @endif
             </div>
         </div>
     </div>
