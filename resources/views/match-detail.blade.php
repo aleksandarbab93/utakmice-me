@@ -1,4 +1,9 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$match['home']['name'].' - '.$match['away']['name'].' — Utakmice.me'">
+@php
+    $matchDescription = $match['status'] === 'scheduled'
+        ? $match['home']['name'].' - '.$match['away']['name'].', '.$match['league'].' — termin, sastavi i najava utakmice uživo.'
+        : $match['home']['name'].' '.$match['home_score'].':'.$match['away_score'].' '.$match['away']['name'].' — '.$match['league'].', rezultat uživo.';
+@endphp
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$match['home']['name'].' - '.$match['away']['name'].' — Utakmice.me'" :description="$matchDescription">
     <div class="max-w-[720px] mx-auto px-4 lg:px-0 py-5 lg:py-8 flex flex-col gap-5">
 
         {{-- Breadcrumb --}}

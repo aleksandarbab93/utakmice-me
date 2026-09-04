@@ -1,4 +1,4 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$league->name.' — Utakmice.me'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$league->name.' — Utakmice.me'" :description="'Tabela, rezultati i raspored '.$league->name.' — uživo, ažurirano poslije svake odigrane utakmice.'">
     <div class="max-w-[1120px] mx-auto px-4 lg:px-7 py-5 lg:py-7 flex flex-col gap-4">
         <x-league-hero :league="$league" :club-count="$clubCount" :season="$season" :round="$round" />
 

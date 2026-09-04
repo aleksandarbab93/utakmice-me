@@ -1,6 +1,6 @@
 @php
     $months = [1=>'januar',2=>'februar',3=>'mart',4=>'april',5=>'maj',6=>'jun',7=>'jul',8=>'avgust',9=>'septembar',10=>'oktobar',11=>'novembar',12=>'decembar'];
-    $weekdays = [1=>'ponedeljak',2=>'utorak',3=>'sreda',4=>'četvrtak',5=>'petak',6=>'subota',7=>'nedelja'];
+    $weekdays = [1=>'ponedjeljak',2=>'utorak',3=>'srijeda',4=>'četvrtak',5=>'petak',6=>'subota',7=>'nedjelja'];
     $dayLabel = function (\Illuminate\Support\Carbon $date) use ($months, $weekdays) {
         if ($date->isToday()) return 'Danas';
         if ($date->isTomorrow()) return 'Sutra';
@@ -10,7 +10,7 @@
     };
 @endphp
 
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$league->name.' — '.($tab === 'results' ? 'Rezultati' : 'Raspored').' — Utakmice.me'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$league->name.' — '.($tab === 'results' ? 'Rezultati' : 'Raspored').' — Utakmice.me'" :description="($tab === 'results' ? 'Rezultati odigranih utakmica — ' : 'Raspored utakmica — ').$league->name.'.'">
     <div class="max-w-[1120px] mx-auto px-4 lg:px-7 py-5 lg:py-7 flex flex-col gap-4">
         <x-league-hero :league="$league" :club-count="$clubCount" :season="$season" />
 

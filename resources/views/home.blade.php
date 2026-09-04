@@ -6,7 +6,7 @@
     $hasMoreMatches = count($activeMatches) > 4;
 @endphp
 
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Naslovna — Utakmice.me'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Naslovna — Utakmice.me'" :description="$sport === 'kosarka' ? 'Košarkaške utakmice uživo i danas — Evroliga, Evrokup. Rezultati, tabele i vijesti iz Crne Gore, Srbije i regiona.' : 'Utakmice uživo i danas — liga petice, Liga prvaka, Prva crnogorska liga, Superliga Srbije i regionalne lige. Rezultati, tabele i vijesti bez čekanja.'">
 
     {{-- Mobile --}}
     <div class="lg:hidden">
@@ -65,7 +65,7 @@
                 @else
                     <div class="border border-dashed border-white/[0.12] rounded-2xl p-4.5 flex flex-col gap-2.5">
                         <span class="text-base font-bold">Trenutno nema mečeva uživo</span>
-                        <span class="text-sm leading-relaxed text-text-muted">Sledeći termini su u tabu DANAS.</span>
+                        <span class="text-sm leading-relaxed text-text-muted">Sljedeći termini su u tabu DANAS.</span>
                         <a href="{{ \App\Support\Nav::home($sport, 'danas') }}" class="h-11 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-sm font-bold">Vidi današnji program</a>
                     </div>
                 @endif
@@ -90,7 +90,7 @@
                 @endforeach
             @else
                 <div class="border border-dashed border-white/[0.12] rounded-2xl p-5 text-center text-text-muted text-sm">
-                    Još nema izveštaja sa mečeva — prvi stiže čim se odigra prvi meč.
+                    Još nema izvještaja sa mečeva — prvi stiže čim se odigra prvi meč.
                 </div>
             @endif
         </div>
@@ -160,11 +160,11 @@
                 <div class="border border-dashed border-white/[0.12] rounded-2xl p-5.5 flex items-center justify-between gap-5">
                     <div class="flex flex-col gap-1.5">
                         <span class="text-base font-bold">Trenutno nema mečeva uživo</span>
-                        <span class="text-sm text-text-muted">Sledeći termini su u tabu DANAS. Uključi obaveštenja i javimo ti kad prvi meč počne.</span>
+                        <span class="text-sm text-text-muted">Sljedeći termini su u tabu DANAS. Uključi obavještenja i javimo ti kad prvi meč počne.</span>
                     </div>
                     <div class="flex gap-2.5 flex-none">
                         <a href="{{ \App\Support\Nav::home($sport, 'danas') }}" class="h-10 px-4.5 rounded-full flex items-center {{ $accent['bg'] }} text-bg text-[13.5px] font-bold">Vidi današnji program</a>
-                        <span class="h-10 px-4.5 rounded-full flex items-center bg-surface border border-white/[0.1] text-text-2 text-[13.5px] font-semibold">Obaveštenja</span>
+                        <span class="h-10 px-4.5 rounded-full flex items-center bg-surface border border-white/[0.1] text-text-2 text-[13.5px] font-semibold">Obavještenja</span>
                     </div>
                 </div>
             @endif
@@ -222,7 +222,7 @@
                     @endif
                 @else
                     <div class="border border-dashed border-white/[0.12] rounded-2xl p-6 text-center text-text-muted text-sm">
-                        Još nema izveštaja sa mečeva — prvi stiže čim se odigra prvi meč.
+                        Još nema izvještaja sa mečeva — prvi stiže čim se odigra prvi meč.
                     </div>
                 @endif
             </div>

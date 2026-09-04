@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * Builds a short, factual "izveštaj" post from a finished fixture — pulling
+ * Builds a short, factual "izvještaj" post from a finished fixture — pulling
  * real goal scorers, half-time score and match statistics from SStats.net's
  * per-match detail endpoint, not just the final score. Phrasing is picked
  * from a small pool per outcome (keyed off the fixture id) so reports don't

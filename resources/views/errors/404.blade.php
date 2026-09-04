@@ -47,7 +47,7 @@
             <div class="flex flex-col gap-4.5 items-start">
                 <span class="font-mono text-[120px] font-bold leading-[0.85] tracking-tighter text-panel">404</span>
                 <h1 class="text-[38px] font-extrabold leading-tight tracking-tight max-w-[18ch]">Ova stranica je promašila gol</h1>
-                <p class="text-base leading-relaxed text-text-muted max-w-[46ch]">Link je star ili je vijest uklonjena. Kreni odavde &mdash; rezultati se osvežavaju svakih 30 sekundi.</p>
+                <p class="text-base leading-relaxed text-text-muted max-w-[46ch]">Link je star ili je vijest uklonjena. Kreni odavde &mdash; rezultati se osvježavaju svakih 30 sekundi.</p>
                 <div class="flex gap-2.5">
                     <a href="{{ \App\Support\Nav::home($sport) }}" class="h-11 px-5 rounded-full bg-text text-bg text-sm font-bold flex items-center">Na naslovnu</a>
                     <a href="{{ \App\Support\Nav::scores($sport) }}" class="h-11 px-5 rounded-full bg-surface border border-white/[0.1] text-sm font-semibold flex items-center">Rezultati dana</a>

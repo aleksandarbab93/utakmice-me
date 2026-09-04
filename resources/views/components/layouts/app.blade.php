@@ -3,15 +3,38 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Utakmice.me' }}</title>
-    @isset($description)
-        <meta name="description" content="{{ $description }}">
-    @endisset
-    @isset($canonical)
-        <link rel="canonical" href="{{ $canonical }}">
-    @endisset
+    @php
+        $metaTitle = $title ?? 'Utakmice.me';
+        $metaDescription = $description ?? 'Rezultati fudbala i košarke uživo iz Crne Gore, Srbije i regiona — Prva crnogorska liga, Superliga Srbije, liga petice i Evroliga. Utakmice danas, tabele i vijesti bez čekanja.';
+    @endphp
+    <title>{{ $metaTitle }}</title>
+    <meta name="description" content="{{ $metaDescription }}">
+    <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="alternate icon" href="/favicon.ico">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Utakmice.me">
+    <meta property="og:locale" content="sr_RS">
+    <meta property="og:title" content="{{ $metaTitle }}">
+    <meta property="og:description" content="{{ $metaDescription }}">
+    <meta property="og:url" content="{{ $canonical ?? url()->current() }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ $metaTitle }}">
+    <meta name="twitter:description" content="{{ $metaDescription }}">
+
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'WebSite',
+        'name' => 'Utakmice.me',
+        'url' => url('/'),
+        'inLanguage' => 'sr',
+        'description' => 'Rezultati fudbala i košarke uživo iz Crne Gore, Srbije i regiona.',
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+    </script>
+
+    @stack('schema')
 
     @production
         <!-- Google tag (gtag.js) -->

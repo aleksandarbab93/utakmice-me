@@ -5,10 +5,14 @@ use App\Http\Controllers\LeaguesController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SportController;
 use App\Http\Controllers\StaticPageController;
 use App\Http\Controllers\StreamsController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])
+    ->name('sitemap');
 
 // Fudbal lives at the site root — no /fudbal prefix.
 Route::get('/', [SportController::class, 'home'])

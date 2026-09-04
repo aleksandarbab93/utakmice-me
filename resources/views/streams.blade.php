@@ -1,4 +1,4 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Prenosi uživo — Utakmice.me'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Prenosi uživo — Utakmice.me'" description="Gdje gledati prenose fudbalskih i košarkaških utakmica uživo — provjereni izvori za mečeve danas.">
     <div class="max-w-2xl mx-auto px-4 lg:px-0 py-5 lg:py-8 flex flex-col gap-5">
 
         <div class="hidden lg:flex flex-col gap-1">

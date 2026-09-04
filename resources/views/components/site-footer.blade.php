@@ -9,7 +9,7 @@
                 <div class="flex items-center gap-2.5">
                     <x-logo size="md" />
                 </div>
-                <p class="text-sm leading-relaxed text-text-muted max-w-[34ch]">Rezultati, tabele i vijesti iz liga petice i evropske košarke. Uživo, bez čekanja na osvežavanje strane.</p>
+                <p class="text-sm leading-relaxed text-text-muted max-w-[34ch]">Rezultati, tabele i vijesti iz liga petice i evropske košarke. Uživo, bez čekanja na osvježavanje strane.</p>
                 <span class="w-9.5 h-9.5 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center" style="width:38px;height:38px">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8CFD8" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="#C8CFD8" stroke="none"/></svg>
                 </span>
@@ -51,7 +51,7 @@
         <div class="border-t border-white/[0.07] py-4.5 flex items-center justify-between gap-5">
             <span class="font-mono text-[10px] tracking-[0.1em] text-text-dim">© 2026 UTAKMICE.ME &middot; SVA PRAVA ZADRŽANA</span>
             <div class="flex items-center gap-5">
-                <span class="font-mono text-[10px] tracking-[0.1em] text-text-dim">REZULTATI SE OSVEŽAVAJU SVAKIH 30 S</span>
+                <span class="font-mono text-[10px] tracking-[0.1em] text-text-dim">REZULTATI SE OSVJEŽAVAJU SVAKIH 30 S</span>
                 <span class="flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-positive"></span>
                     <span class="font-mono text-[10px] tracking-[0.1em] text-text-muted">SVI SERVISI RADE</span>
@@ -96,7 +96,7 @@
                 <a href="{{ \App\Support\Nav::advertising() }}" class="text-[12.5px] text-text-muted">Oglašavanje</a>
                 <a href="{{ \App\Support\Nav::contact() }}" class="text-[12.5px] text-text-muted">Kontakt</a>
             </div>
-            <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">© 2026 UTAKMICE.ME &middot; OSVEŽAVANJE 30 S</span>
+            <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">© 2026 UTAKMICE.ME &middot; OSVJEŽAVANJE 30 S</span>
         </div>
     </div>
 </footer>

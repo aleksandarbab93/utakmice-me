@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 
 class RelativeTime
 {
-    /** "Pre 12 minuta" / "Pre 3 sata" / "Pre 2 dana" — Serbian relative-time label. */
+    /** "Prije 12 minuta" / "Prije 3 sata" / "Prije 2 dana" — ijekavian relative-time label. */
     public static function sr(Carbon $date): string
     {
         $minutes = max(0, (int) floor($date->diffInMinutes(Carbon::now())));
@@ -16,16 +16,16 @@ class RelativeTime
         }
 
         if ($minutes < 60) {
-            return 'Pre '.$minutes.' '.Plural::sr($minutes, 'minut', 'minuta', 'minuta');
+            return 'Prije '.$minutes.' '.Plural::sr($minutes, 'minut', 'minuta', 'minuta');
         }
 
         $hours = intdiv($minutes, 60);
         if ($hours < 24) {
-            return 'Pre '.$hours.' '.Plural::sr($hours, 'sat', 'sata', 'sati');
+            return 'Prije '.$hours.' '.Plural::sr($hours, 'sat', 'sata', 'sati');
         }
 
         $days = intdiv($hours, 24);
 
-        return 'Pre '.$days.' '.Plural::sr($days, 'dan', 'dana', 'dana');
+        return 'Prije '.$days.' '.Plural::sr($days, 'dan', 'dana', 'dana');
     }
 }

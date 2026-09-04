@@ -24,7 +24,7 @@ class PostFeed
     }
 
     /**
-     * Chronological izveštaj feed for the /vijesti listing page, optionally
+     * Chronological izvještaj feed for the /vijesti listing page, optionally
      * narrowed to one league. Fudbal only — that page's chips, copy and SEO
      * description are all written for football; košarka reports show on
      * their own home page instead until this page is worth splitting by sport.
@@ -41,7 +41,7 @@ class PostFeed
             ->through(fn (Post $post) => self::format($post));
     }
 
-    /** Distinct leagues with at least one izveštaj post — for the /vijesti filter chips. */
+    /** Distinct leagues with at least one izvještaj post — for the /vijesti filter chips. */
     public static function reportLeagues(): Collection
     {
         return Post::where('type', 'izvestaj')

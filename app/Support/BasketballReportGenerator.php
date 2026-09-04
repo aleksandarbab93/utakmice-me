@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * Builds a short, factual "izveštaj" post from a finished EuroLeague/EuroCup
+ * Builds a short, factual "izvještaj" post from a finished EuroLeague/EuroCup
  * game — using the quarter-by-quarter score (already part of the same
  * payload SyncBasketballData/SyncLiveBasketball fetch, so this costs no
  * extra API call) to narrate how the game actually developed, not just the
@@ -142,7 +142,7 @@ class BasketballReportGenerator
         }
 
         if ($overtime) {
-            return "{$winner} slavio protiv {$loser} tek posle produžetka ({$hs}:{$as})";
+            return "{$winner} slavio protiv {$loser} tek poslije produžetka ({$hs}:{$as})";
         }
 
         if ($winnerTrailedEarlier) {
