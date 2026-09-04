@@ -56,6 +56,12 @@ class SyncFootballData extends Command
             } catch (\Throwable $e) {
                 $this->error("  {$name}: {$e->getMessage()}");
             }
+
+            // A full-size league's own paginated walk already spends most of
+            // the shared per-minute allowance, so the next league's first
+            // request lands before it has refilled. Let it recover instead
+            // of racing straight into another 429.
+            sleep(60);
         }
 
         $this->info('Done.');
