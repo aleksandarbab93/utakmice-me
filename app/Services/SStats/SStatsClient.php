@@ -92,7 +92,11 @@ class SStatsClient
             $query['apikey'] = $this->apiKey;
         }
 
-        $response = Http::baseUrl($this->baseUrl)->get($path, $query);
+        // A full season's /games/list comes with a full odds tree per match,
+        // which is slow enough over the shared/anonymous tier to blow past
+        // Laravel's 30s default — 2 retries buys some resilience against a
+        // one-off stall without hammering the shared rate limit.
+        $response = Http::baseUrl($this->baseUrl)->timeout(120)->retry(2, 3000)->get($path, $query);
         $response->throw();
 
         return $response->json() ?? [];
