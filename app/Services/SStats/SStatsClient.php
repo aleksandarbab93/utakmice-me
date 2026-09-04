@@ -22,7 +22,7 @@ class SStatsClient
     /** Full season fixture list for a league (played + upcoming). */
     public function fixtures(int $leagueId, int $year): array
     {
-        return $this->get('/games/list', ['LeagueId' => $leagueId, 'Year' => $year])['data'] ?? [];
+        return $this->getPaged('/games/list', ['LeagueId' => $leagueId, 'Year' => $year]);
     }
 
     /** Current standings table for a league season. */
@@ -46,7 +46,7 @@ class SStatsClient
      */
     public function liveGames(): array
     {
-        return $this->get('/games/list', ['Live' => 'true'])['data'] ?? [];
+        return $this->getPaged('/games/list', ['Live' => 'true']);
     }
 
     /**
@@ -86,17 +86,50 @@ class SStatsClient
         ])['data'] ?? [];
     }
 
+    /**
+     * The same listing, fetched a page at a time.
+     *
+     * Not an optimization — a requirement. A full season's /games/list
+     * carries a full odds tree per match, and some hosts (ours included)
+     * cannot finish reading a response past roughly 14 KB: the connection
+     * delivers the first burst and then stalls until it times out, whatever
+     * the timeout length. Ten rows keeps every page comfortably under that,
+     * matching what utakmice-rs-master measured on the same kind of host.
+     *
+     * Only /games/list supports Limit/Offset.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getPaged(string $path, array $query = []): array
+    {
+        $size = 10;
+        $maxPages = 500;
+        $rows = [];
+
+        for ($page = 0; $page < $maxPages; $page++) {
+            $batch = $this->get($path, $query + ['Limit' => $size, 'Offset' => $page * $size])['data'] ?? [];
+            $rows = array_merge($rows, $batch);
+
+            if (count($batch) < $size) {
+                break;
+            }
+
+            // Measured against the live source, keyless: bursting eats a 429
+            // within seconds, but one request every two seconds gets through
+            // clean — the same pacing utakmice-rs-master settled on.
+            usleep(2000000);
+        }
+
+        return $rows;
+    }
+
     private function get(string $path, array $query = []): array
     {
         if ($this->apiKey) {
             $query['apikey'] = $this->apiKey;
         }
 
-        // A full season's /games/list comes with a full odds tree per match,
-        // which is slow enough over the shared/anonymous tier to blow past
-        // Laravel's 30s default — 2 retries buys some resilience against a
-        // one-off stall without hammering the shared rate limit.
-        $response = Http::baseUrl($this->baseUrl)->timeout(120)->retry(2, 3000)->get($path, $query);
+        $response = Http::baseUrl($this->baseUrl)->timeout(20)->retry(2, 3000)->get($path, $query);
         $response->throw();
 
         return $response->json() ?? [];
