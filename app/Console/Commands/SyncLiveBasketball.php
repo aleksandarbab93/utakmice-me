@@ -126,7 +126,7 @@ class SyncLiveBasketball extends Command
             return 'finished';
         }
 
-        $kickoff = Carbon::parse($game['date']);
+        $kickoff = isset($game['utcDate']) ? Carbon::parse($game['utcDate'])->utc() : Carbon::parse($game['date'], 'Europe/Belgrade')->utc();
         $now = Carbon::now();
 
         if ($now->greaterThanOrEqualTo($kickoff) && $now->lessThan($kickoff->copy()->addHours(3))) {

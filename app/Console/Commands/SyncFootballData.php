@@ -86,7 +86,11 @@ class SyncFootballData extends Command
                     'league_id' => $league->id,
                     'home_team_id' => $home->id,
                     'away_team_id' => $away->id,
-                    'kickoff_at' => $game['date'],
+                    // SStats' 'date' carries whatever offset their servers happen to
+                    // report in (seen both +00:00 and +03:00) — normalize to UTC so
+                    // it lines up with now()-based live-window queries, and convert
+                    // back to a local timezone only at display time.
+                    'kickoff_at' => Carbon::parse($game['date'])->utc(),
                     'status' => SStatsClient::mapStatus($game['status']),
                     'home_score' => $game['homeResult'],
                     'away_score' => $game['awayResult'],

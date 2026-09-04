@@ -22,10 +22,10 @@
                     {{ $tab === 'results' ? 'Još nema odigranih mečeva u ovom takmičenju.' : 'Trenutno nema zakazanih mečeva.' }}
                 </div>
             @else
-                @foreach ($fixtures->getCollection()->groupBy(fn ($f) => $f->kickoff_at->toDateString()) as $day => $dayFixtures)
+                @foreach ($fixtures->getCollection()->groupBy(fn ($f) => $f->kickoff_at->local()->toDateString()) as $day => $dayFixtures)
                     <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
                         <div class="flex items-center justify-between gap-3 px-3.5 py-3 border-b border-white/[0.07]">
-                            <span class="text-[13px] font-bold">{{ ucfirst($dayLabel($dayFixtures->first()->kickoff_at)) }}</span>
+                            <span class="text-[13px] font-bold">{{ ucfirst($dayLabel($dayFixtures->first()->kickoff_at->local())) }}</span>
                             @if ($first = \App\Support\RoundLabel::sr($dayFixtures->first()->matchday))
                                 <span class="font-mono text-[10px] text-text-dim flex-none">{{ $first }}</span>
                             @endif
@@ -44,7 +44,7 @@
                                     'home_score' => $f->home_score,
                                     'away_score' => $f->away_score,
                                     'minute' => $f->status === 'live' && $f->minute ? $f->minute."'" : null,
-                                    'kickoff' => $f->kickoff_at->format('H:i'),
+                                    'kickoff' => $f->kickoff_at->local()->format('H:i'),
                                 ];
                             @endphp
                             <x-score-row :match="$payload" />

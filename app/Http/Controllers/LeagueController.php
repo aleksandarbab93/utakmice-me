@@ -119,7 +119,7 @@ class LeagueController extends Controller
             'home_score' => $f->home_score,
             'away_score' => $f->away_score,
             'minute' => $f->status === 'live' && $f->minute ? $f->minute."'" : null,
-            'kickoff' => $f->kickoff_at->format('H:i'),
+            'kickoff' => $f->kickoff_at->local()->format('H:i'),
         ];
     }
 

@@ -25,7 +25,7 @@ class StreamsController extends Controller
 
         $groups = $fixtures
             ->sortBy(fn (Fixture $fixture) => [$fixture->isLive() ? 0 : 1, $fixture->kickoff_at->timestamp])
-            ->groupBy(fn (Fixture $fixture) => $fixture->kickoff_at->format('Y-m-d'));
+            ->groupBy(fn (Fixture $fixture) => $fixture->kickoff_at->local()->format('Y-m-d'));
 
         return view('streams', [
             'sport' => 'fudbal',

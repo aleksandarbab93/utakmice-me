@@ -26,7 +26,7 @@ class BasketballMatchDetail
             'away' => ['name' => $fixture->awayTeam->name, 'initials' => TeamBadge::initials($fixture->awayTeam->name), 'crest' => $fixture->awayTeam->crest_url],
             'status' => $fixture->status,
             'statusLabel' => self::statusLabel($fixture),
-            'kickoff' => $fixture->kickoff_at->format('d.m.Y. H:i'),
+            'kickoff' => $fixture->kickoff_at->local()->format('d.m.Y. H:i'),
             'home_score' => $fixture->home_score,
             'away_score' => $fixture->away_score,
             'venue' => $fixture->venue,
@@ -42,7 +42,7 @@ class BasketballMatchDetail
         }
 
         if ($fixture->status === 'scheduled') {
-            return $fixture->kickoff_at->format('d.m.Y. H:i');
+            return $fixture->kickoff_at->local()->format('d.m.Y. H:i');
         }
 
         return 'UŽIVO';

@@ -79,7 +79,12 @@ class SyncBasketballData extends Command
                     'league_id' => $league->id,
                     'home_team_id' => $home->id,
                     'away_team_id' => $away->id,
-                    'kickoff_at' => $game['date'],
+                    // Euroleague's 'date' is a naive local-venue timestamp (see
+                    // 'localTimeZone'/'localDate') — 'utcDate' is the same instant
+                    // explicitly in UTC, which is what we actually want to store.
+                    'kickoff_at' => isset($game['utcDate'])
+                        ? Carbon::parse($game['utcDate'])->utc()
+                        : Carbon::parse($game['date'], 'Europe/Belgrade')->utc(),
                     'status' => $this->matchStatus($game),
                     'home_score' => $game['local']['score'] ?: null,
                     'away_score' => $game['road']['score'] ?: null,
@@ -151,7 +156,7 @@ class SyncBasketballData extends Command
             return 'finished';
         }
 
-        $kickoff = Carbon::parse($game['date']);
+        $kickoff = isset($game['utcDate']) ? Carbon::parse($game['utcDate'])->utc() : Carbon::parse($game['date'], 'Europe/Belgrade')->utc();
         $now = Carbon::now();
 
         if ($now->greaterThanOrEqualTo($kickoff) && $now->lessThan($kickoff->copy()->addHours(3))) {

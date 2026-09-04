@@ -73,7 +73,7 @@ class FootballFeed
                     'home_score' => $f->home_score,
                     'away_score' => $f->away_score,
                     'minute' => $f->status === 'live' && $f->minute ? $f->minute."'" : null,
-                    'kickoff' => $f->kickoff_at->format('H:i'),
+                    'kickoff' => $f->kickoff_at->local()->format('H:i'),
                 ])
                 ->values();
 
@@ -99,7 +99,7 @@ class FootballFeed
         $map = fn (Fixture $f) => [
             'id' => $f->id,
             'league' => strtoupper($f->league->name),
-            'status' => $f->status === 'live' ? ($f->minute ? $f->minute."'" : 'UŽIVO') : $f->kickoff_at->format('H:i'),
+            'status' => $f->status === 'live' ? ($f->minute ? $f->minute."'" : 'UŽIVO') : $f->kickoff_at->local()->format('H:i'),
             'live' => $f->status === 'live',
             'home' => $f->homeTeam->name,
             'away' => $f->awayTeam->name,
@@ -160,7 +160,7 @@ class FootballFeed
             'zones' => $zones,
             'next' => $next ? [
                 'label' => $next->homeTeam->name.' — '.$next->awayTeam->name,
-                'when' => self::DAY_ABBR[$next->kickoff_at->isoWeekday()].' '.$next->kickoff_at->format('H:i'),
+                'when' => self::DAY_ABBR[$next->kickoff_at->local()->isoWeekday()].' '.$next->kickoff_at->local()->format('H:i'),
             ] : null,
         ];
     }
@@ -188,7 +188,7 @@ class FootballFeed
 
                 return [
                     'result' => $for > $against ? 'W' : ($for < $against ? 'L' : 'D'),
-                    'tooltip' => "{$f->home_score}:{$f->away_score} ({$f->homeTeam->name} - {$f->awayTeam->name})\n".$f->kickoff_at->format('d.m.Y.'),
+                    'tooltip' => "{$f->home_score}:{$f->away_score} ({$f->homeTeam->name} - {$f->awayTeam->name})\n".$f->kickoff_at->local()->format('d.m.Y.'),
                 ];
             })
             ->all();
@@ -208,6 +208,6 @@ class FootballFeed
             return null;
         }
 
-        return "Sljedeća utakmica:\n{$fixture->homeTeam->name} - {$fixture->awayTeam->name}\n".$fixture->kickoff_at->format('d.m.Y.');
+        return "Sljedeća utakmica:\n{$fixture->homeTeam->name} - {$fixture->awayTeam->name}\n".$fixture->kickoff_at->local()->format('d.m.Y.');
     }
 }
