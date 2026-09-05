@@ -53,7 +53,7 @@ class FootballFeed
         $leagues = self::leagues();
 
         $fixtures = Fixture::whereIn('league_id', $leagues->pluck('id'))
-            ->whereDate('kickoff_at', $date)
+            ->whereBetween('kickoff_at', LocalDay::bounds($date))
             ->with(['homeTeam', 'awayTeam', 'league'])
             ->orderBy('kickoff_at')
             ->get()
@@ -93,8 +93,8 @@ class FootballFeed
         $base = Fixture::whereIn('league_id', $leagueIds)->with(['homeTeam', 'awayTeam', 'league']);
 
         $uzivo = (clone $base)->where('status', 'live')->get();
-        $danas = (clone $base)->where('status', '!=', 'live')->whereDate('kickoff_at', Carbon::today())->orderBy('kickoff_at')->get();
-        $sutra = (clone $base)->whereDate('kickoff_at', Carbon::tomorrow())->orderBy('kickoff_at')->get();
+        $danas = (clone $base)->where('status', '!=', 'live')->whereBetween('kickoff_at', LocalDay::bounds(Carbon::today()))->orderBy('kickoff_at')->get();
+        $sutra = (clone $base)->whereBetween('kickoff_at', LocalDay::bounds(Carbon::tomorrow()))->orderBy('kickoff_at')->get();
 
         $map = fn (Fixture $f) => [
             'id' => $f->id,

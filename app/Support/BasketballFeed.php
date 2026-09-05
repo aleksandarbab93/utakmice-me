@@ -30,7 +30,7 @@ class BasketballFeed
         $leagues = self::leagues();
 
         $fixtures = Fixture::whereIn('league_id', $leagues->pluck('id'))
-            ->whereDate('kickoff_at', $date)
+            ->whereBetween('kickoff_at', LocalDay::bounds($date))
             ->with(['homeTeam', 'awayTeam', 'league'])
             ->orderBy('kickoff_at')
             ->get()
@@ -70,8 +70,8 @@ class BasketballFeed
         $base = Fixture::whereIn('league_id', $leagueIds)->with(['homeTeam', 'awayTeam', 'league']);
 
         $uzivo = (clone $base)->where('status', 'live')->get();
-        $danas = (clone $base)->where('status', '!=', 'live')->whereDate('kickoff_at', Carbon::today())->orderBy('kickoff_at')->get();
-        $sutra = (clone $base)->whereDate('kickoff_at', Carbon::tomorrow())->orderBy('kickoff_at')->get();
+        $danas = (clone $base)->where('status', '!=', 'live')->whereBetween('kickoff_at', LocalDay::bounds(Carbon::today()))->orderBy('kickoff_at')->get();
+        $sutra = (clone $base)->whereBetween('kickoff_at', LocalDay::bounds(Carbon::tomorrow()))->orderBy('kickoff_at')->get();
 
         $map = fn (Fixture $f) => [
             'id' => $f->id,
@@ -97,11 +97,11 @@ class BasketballFeed
         $leagueIds = self::leagues()->pluck('id');
 
         $fixture = Fixture::whereIn('league_id', $leagueIds)
-            ->whereDate('kickoff_at', '>=', Carbon::today())
+            ->where('kickoff_at', '>=', LocalDay::bounds(Carbon::today())[0])
             ->orderBy('kickoff_at')
             ->first();
 
-        return $fixture?->kickoff_at->copy()->startOfDay();
+        return $fixture?->kickoff_at->local()->startOfDay();
     }
 
     /** The opening round's fixtures — a preseason stand-in for the home page's empty uživo/danas/sutra widget. */
@@ -116,7 +116,7 @@ class BasketballFeed
         $leagueIds = self::leagues()->pluck('id');
 
         $matches = Fixture::whereIn('league_id', $leagueIds)
-            ->whereDate('kickoff_at', $date)
+            ->whereBetween('kickoff_at', LocalDay::bounds($date))
             ->with(['homeTeam', 'awayTeam', 'league'])
             ->orderBy('kickoff_at')
             ->get()

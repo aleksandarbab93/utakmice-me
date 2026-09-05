@@ -20,7 +20,7 @@
         </p>
 
         @forelse ($groups as $day => $fixtures)
-            @php $date = \Illuminate\Support\Carbon::parse($day); @endphp
+            @php $date = \Illuminate\Support\Carbon::parse($day, 'Europe/Belgrade'); @endphp
             <div class="flex flex-col gap-3">
                 <div class="flex items-center gap-2.5 px-1">
                     <span class="w-[3px] h-3.5 rounded {{ $accent['bg'] }}"></span>
