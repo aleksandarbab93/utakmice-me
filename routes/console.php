@@ -30,8 +30,16 @@ Artisan::command('inspire', function () {
 | the next day's run finds it still there.
 */
 
-Schedule::command('football:sync')->everyFifteenMinutes()->withoutOverlapping(60);
-Schedule::command('basketball:sync')->everyFifteenMinutes()->withoutOverlapping(60);
+// Daily, not every 15 minutes: a full run now correctly paces every SStats
+// call at the ~1-per-2s rate its keyless tier actually sustains (see
+// SStatsClient::getPaged()), which makes a 14-league run take 20-40+
+// minutes — running that every 15 minutes meant it was effectively always
+// in flight, permanently starving football:sync-live and the match-detail
+// page of the same shared rate-limit budget. Fixture schedules and league
+// tables barely change hour to hour; sync-live already covers anything
+// actually live or about to kick off.
+Schedule::command('football:sync')->dailyAt('04:00')->withoutOverlapping(180);
+Schedule::command('basketball:sync')->dailyAt('04:30')->withoutOverlapping(180);
 
 Schedule::command('football:sync-live')->everyMinute()->withoutOverlapping(5);
 Schedule::command('basketball:sync-live')->everyMinute()->withoutOverlapping(5);
