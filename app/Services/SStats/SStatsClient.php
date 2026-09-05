@@ -2,6 +2,8 @@
 
 namespace App\Services\SStats;
 
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -123,13 +125,44 @@ class SStatsClient
         return $rows;
     }
 
+    /**
+     * Once anyone hits the shared per-minute limit, every other process —
+     * the every-minute live sync, a visitor's match-detail page, the daily
+     * full sync — shares the same budget and would just get refused too.
+     * This cache flag makes that failure instant and free instead of every
+     * process finding out the hard way with its own request and retries,
+     * which was compounding the outage instead of letting it clear.
+     */
+    private const COOLDOWN_KEY = 'sstats:cooldown';
+
     private function get(string $path, array $query = []): array
     {
+        if (Cache::get(self::COOLDOWN_KEY)) {
+            return [];
+        }
+
         if ($this->apiKey) {
             $query['apikey'] = $this->apiKey;
         }
 
-        $response = Http::baseUrl($this->baseUrl)->timeout(20)->retry(2, 3000)->get($path, $query);
+        try {
+            $response = Http::baseUrl($this->baseUrl)
+                ->timeout(20)
+                // A 429 won't have cleared in the few seconds a retry would
+                // wait — that's just two more requests spent on a budget
+                // already at zero. Only retry genuine transient failures.
+                ->retry(2, 3000, fn (\Throwable $e) => ! ($e instanceof RequestException && $e->response->status() === 429))
+                ->get($path, $query);
+        } catch (RequestException $e) {
+            if ($e->response->status() === 429) {
+                Cache::put(self::COOLDOWN_KEY, true, now()->addSeconds(45));
+
+                return [];
+            }
+
+            throw $e;
+        }
+
         $response->throw();
 
         return $response->json() ?? [];
