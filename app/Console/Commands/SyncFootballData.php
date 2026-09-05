@@ -107,7 +107,14 @@ class SyncFootballData extends Command
 
             if (MatchReportGenerator::generate($fixture, $client)) {
                 $reportsGenerated++;
-                usleep(400000); // the extra per-match detail call adds to the shared rate limit budget
+
+                // Same 2s pace as the paginated fixture walk above — this
+                // runs right after it, so the shared per-minute allowance
+                // is already spent; firing gameDetail() calls faster than
+                // that here is what was turning finished-match reports
+                // generic (the detail call silently 429ing, caught, and
+                // falling back to a scoreline-only report with no events).
+                sleep(2);
             }
         }
 
