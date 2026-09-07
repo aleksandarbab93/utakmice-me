@@ -46,7 +46,7 @@ Route::get('/vijesti', [PostController::class, 'index'])
 Route::get('/vijesti/{slug}', [PostController::class, 'show'])
     ->name('post.show');
 
-Route::get('/mec/{fixture}', [MatchController::class, 'show'])
+Route::get('/mec/{slug}', [MatchController::class, 'show'])
     ->name('match.show');
 
 Route::get('/prenosi-uzivo', [StreamsController::class, 'index'])

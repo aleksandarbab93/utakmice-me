@@ -141,6 +141,7 @@ class SyncFootballData extends Command
                 'league_id' => $league->id,
                 'name' => $team['name'],
                 'short_name' => $team['name'],
+                'slug' => $existing?->slug ?? Team::uniqueSlug($team['name'], $league->name, (string) $team['id']),
                 'crest_url' => $crestUrl,
             ],
         );

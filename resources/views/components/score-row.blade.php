@@ -6,7 +6,7 @@
     $scoreColor = $match['status'] === 'live' ? 'text-live-text' : '';
 @endphp
 
-<a href="{{ \App\Support\Nav::match($match['id']) }}" class="flex items-center gap-3 px-3.5 py-3 border-b border-white/[0.05] last:border-0 hover:bg-white/[0.02]">
+<a href="{{ \App\Support\Nav::match($match['slug']) }}" class="flex items-center gap-3 px-3.5 py-3 border-b border-white/[0.05] last:border-0 hover:bg-white/[0.02]">
     <div class="hidden lg:block w-11 flex-none text-center">
         @if ($match['status'] === 'live')
             <span class="font-mono text-[10px] font-bold text-live-text">{{ $match['minute'] }}</span>

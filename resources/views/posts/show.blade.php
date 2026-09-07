@@ -123,7 +123,7 @@
                         <div class="p-3.5 flex flex-col gap-2.5">
                             <div class="flex justify-between"><span class="text-[14.5px] font-bold">{{ $match['home'] }}</span><span class="font-mono text-base font-bold">{{ $match['home_score'] }}</span></div>
                             <div class="flex justify-between text-text-muted"><span class="text-[14.5px]">{{ $match['away'] }}</span><span class="font-mono text-base font-bold">{{ $match['away_score'] }}</span></div>
-                            <a href="{{ \App\Support\Nav::match($match['id']) }}" class="h-9.5 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-[13px] font-bold" style="height:38px">Tok meča</a>
+                            <a href="{{ \App\Support\Nav::match($match['slug']) }}" class="h-9.5 rounded-full flex items-center justify-center {{ $accent['bg'] }} text-bg text-[13px] font-bold" style="height:38px">Tok meča</a>
                         </div>
                     </div>
                 @endif

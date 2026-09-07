@@ -118,6 +118,7 @@ class PostFeed
 
         return [
             'id' => $fixture->id,
+            'slug' => $fixture->slug,
             'home' => $fixture->homeTeam->name,
             'away' => $fixture->awayTeam->name,
             'home_score' => $fixture->home_score,

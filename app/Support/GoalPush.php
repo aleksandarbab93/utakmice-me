@@ -39,7 +39,7 @@ class GoalPush
         WebPush::send($subscriptions, [
             'title' => "GOL! {$fixture->homeTeam->name} {$fixture->home_score}:{$fixture->away_score} {$fixture->awayTeam->name}",
             'body' => trim(($fixture->minute ? $fixture->minute."' · " : '').($fixture->league?->name ?? '')),
-            'url' => Nav::match($fixture->id),
+            'url' => Nav::match($fixture->slug),
             // One notification per match, replaced rather than stacked: three
             // goals in ten minutes should leave one line on the lock screen
             // showing the current score, not three showing the history.

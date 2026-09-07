@@ -56,6 +56,17 @@ class Fixture extends Model
         return $this->status === 'live';
     }
 
+    /**
+     * SEO slug for the match-detail URL: crvena-zvezda-partizan-2026-08-09.
+     * Computed, not stored — team slugs are stable and the date is the
+     * local calendar day the visitor would actually call "the match",
+     * matching how MatchController parses it back apart.
+     */
+    public function getSlugAttribute(): string
+    {
+        return $this->homeTeam->slug.'-'.$this->awayTeam->slug.'-'.$this->kickoff_at->local()->format('Y-m-d');
+    }
+
     public function scopeLive(Builder $query): Builder
     {
         return $query->where('status', 'live');

@@ -63,6 +63,7 @@ class FootballFeed
             $matches = ($fixtures->get($league->id) ?? collect())
                 ->map(fn (Fixture $f) => [
                     'id' => $f->id,
+                    'slug' => $f->slug,
                     'home' => $f->homeTeam->name,
                     'homeInitials' => TeamBadge::initials($f->homeTeam->name),
                     'homeCrest' => $f->homeTeam->crest_url,
@@ -98,6 +99,7 @@ class FootballFeed
 
         $map = fn (Fixture $f) => [
             'id' => $f->id,
+            'slug' => $f->slug,
             'league' => strtoupper($f->league->name),
             'status' => $f->status === 'live' ? ($f->minute ? $f->minute."'" : 'UŽIVO') : $f->kickoff_at->local()->format('H:i'),
             'live' => $f->status === 'live',

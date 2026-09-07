@@ -29,7 +29,7 @@
                     $homeWins = $finished && (int) $m['hs'] > (int) $m['as'];
                     $awayWins = $finished && (int) $m['as'] > (int) $m['hs'];
                 @endphp
-                <a href="{{ isset($m['id']) ? \App\Support\Nav::match($m['id']) : \App\Support\Nav::scores($sport) }}" class="bg-surface border border-white/[0.07] rounded-2xl p-3.5 flex items-center gap-3.5">
+                <a href="{{ isset($m['id']) ? \App\Support\Nav::match($m['slug']) : \App\Support\Nav::scores($sport) }}" class="bg-surface border border-white/[0.07] rounded-2xl p-3.5 flex items-center gap-3.5">
                     <div class="w-11.5 flex-none flex flex-col items-center gap-0.5" style="width:46px">
                         <span class="font-mono text-[10px] font-bold {{ $m['live'] ? 'text-live-text' : 'text-text-muted' }}">{{ $m['status'] }}</span>
                         <span class="font-mono text-[7.5px] tracking-[0.1em] text-text-dim">{{ $m['league'] }}</span>
@@ -123,7 +123,7 @@
                             $homeWins = $finished && (int) $m['hs'] > (int) $m['as'];
                             $awayWins = $finished && (int) $m['as'] > (int) $m['hs'];
                         @endphp
-                        <a href="{{ isset($m['id']) ? \App\Support\Nav::match($m['id']) : \App\Support\Nav::scores($sport) }}" class="bg-surface border border-white/[0.07] rounded-2xl p-3.5 flex flex-col gap-2.5">
+                        <a href="{{ isset($m['id']) ? \App\Support\Nav::match($m['slug']) : \App\Support\Nav::scores($sport) }}" class="bg-surface border border-white/[0.07] rounded-2xl p-3.5 flex flex-col gap-2.5">
                             <div class="flex justify-between items-center">
                                 <span class="font-mono text-[9px] tracking-[0.12em] text-text-muted">{{ $m['league'] }}</span>
                                 <span class="font-mono text-[9.5px] font-bold tracking-[0.1em] {{ $m['live'] ? 'text-live-text' : 'text-text-muted' }}">{{ $m['status'] }}</span>

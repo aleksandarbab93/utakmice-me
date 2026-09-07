@@ -50,10 +50,14 @@ class SitemapController extends Controller
                     ];
                 });
 
-            Fixture::query()->select('id', 'kickoff_at', 'status')->orderByDesc('kickoff_at')->get()
+            Fixture::query()
+                ->select('id', 'home_team_id', 'away_team_id', 'kickoff_at', 'status')
+                ->with(['homeTeam:id,slug', 'awayTeam:id,slug'])
+                ->orderByDesc('kickoff_at')
+                ->get()
                 ->each(function (Fixture $fixture) use (&$urls) {
                     $urls[] = [
-                        'loc' => route('match.show', $fixture->id),
+                        'loc' => route('match.show', $fixture->slug),
                         'lastmod' => $fixture->kickoff_at?->toAtomString(),
                         'priority' => $fixture->status === 'live' ? '0.9' : '0.4',
                     ];

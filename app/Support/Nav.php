@@ -30,9 +30,9 @@ class Nav
         return $liga ? $url.'?liga='.$liga : $url;
     }
 
-    public static function match(int $fixtureId): string
+    public static function match(string $slug): string
     {
-        return route('match.show', $fixtureId);
+        return route('match.show', $slug);
     }
 
     public static function news(?string $liga = null): string

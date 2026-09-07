@@ -134,12 +134,15 @@ class SyncBasketballData extends Command
 
     private function upsertTeam(League $league, array $club): Team
     {
+        $existing = Team::where('external_source', 'euroleague')->where('external_id', $club['code'])->first();
+
         return Team::updateOrCreate(
             ['external_source' => 'euroleague', 'external_id' => $club['code']],
             [
                 'league_id' => $league->id,
                 'name' => $club['name'],
                 'short_name' => $club['abbreviatedName'] ?? $club['name'],
+                'slug' => $existing?->slug ?? Team::uniqueSlug($club['name'], $league->name, $club['code']),
                 'crest_url' => $club['images']['crest'] ?? null,
             ],
         );
