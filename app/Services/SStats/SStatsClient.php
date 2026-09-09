@@ -148,6 +148,19 @@ class SStatsClient
         try {
             $response = Http::baseUrl($this->baseUrl)
                 ->timeout(20)
+                // Plain curl from the same box completes instantly and every
+                // time; only requests going through PHP's pooled/keep-alive
+                // connection stall, always at the same byte count, always for
+                // the full timeout — a reused connection left in a bad state
+                // by whatever request came before it, not a slow server. A
+                // fresh connection per request costs one extra TCP/TLS
+                // handshake but sidesteps that entirely.
+                ->withOptions([
+                    'curl' => [
+                        CURLOPT_FRESH_CONNECT => true,
+                        CURLOPT_FORBID_REUSE => true,
+                    ],
+                ])
                 // A 429 won't have cleared in the few seconds a retry would
                 // wait — that's just two more requests spent on a budget
                 // already at zero. Only retry genuine transient failures.
