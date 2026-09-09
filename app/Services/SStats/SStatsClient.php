@@ -148,13 +148,16 @@ class SStatsClient
         try {
             $response = Http::baseUrl($this->baseUrl)
                 ->timeout(20)
-                // Plain curl from the same box completes instantly and every
-                // time; only requests going through PHP's pooled/keep-alive
-                // connection stall, always at the same byte count, always for
-                // the full timeout — a reused connection left in a bad state
-                // by whatever request came before it, not a slow server. A
-                // fresh connection per request costs one extra TCP/TLS
-                // handshake but sidesteps that entirely.
+                // A fresh connection per request didn't change anything,
+                // ruling out a reused/pooled connection. The one difference
+                // left between "plain curl from this box: always fine" and
+                // "same request through Guzzle: always stalls at the same
+                // byte count" is what's on the wire — Guzzle identifies
+                // itself as "GuzzleHttp/x"; something between us and SStats
+                // (a WAF/CDN in front of it would be typical) may be
+                // shaping or silently dropping the tail of the response for
+                // that UA while leaving curl's alone.
+                ->withUserAgent('curl/8.5.0')
                 ->withOptions([
                     'curl' => [
                         CURLOPT_FRESH_CONNECT => true,
