@@ -2,9 +2,8 @@
 
 namespace App\Services\SStats;
 
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 /**
  * Thin wrapper around the free SStats.net football data API
@@ -145,43 +144,77 @@ class SStatsClient
             $query['apikey'] = $this->apiKey;
         }
 
-        try {
-            $response = Http::baseUrl($this->baseUrl)
-                ->timeout(20)
-                // Diagnosed on prod with CURLOPT_VERBOSE: SStats negotiates
-                // HTTP/2 over TLS (ALPN), sends every header and the full
-                // response body, then never sends the frame that marks the
-                // stream finished — a server-side HTTP/2 bug. Every client
-                // that also speaks h2 hangs forever waiting for a stream end
-                // that's never coming; a plain `curl` from the same box only
-                // "worked" by accident (its ALPN negotiation didn't always
-                // land on h2). Disabling ALPN keeps the connection on
-                // HTTP/1.1, which signals the end of a response some other
-                // way and isn't affected by this.
-                ->withOptions([
-                    'curl' => [
-                        CURLOPT_SSL_ENABLE_ALPN => false,
-                        CURLOPT_FRESH_CONNECT => true,
-                        CURLOPT_FORBID_REUSE => true,
-                    ],
-                ])
-                // A 429 won't have cleared in the few seconds a retry would
-                // wait — that's just two more requests spent on a budget
-                // already at zero. Only retry genuine transient failures.
-                ->retry(2, 3000, fn (\Throwable $e) => ! ($e instanceof RequestException && $e->response->status() === 429))
-                ->get($path, $query);
-        } catch (RequestException $e) {
-            if ($e->response->status() === 429) {
+        $url = rtrim($this->baseUrl, '/').'/'.ltrim($path, '/');
+        if ($query !== []) {
+            $url .= '?'.http_build_query($query);
+        }
+
+        $attempts = 0;
+
+        while (true) {
+            $attempts++;
+
+            try {
+                [$status, $body] = $this->curlGet($url);
+            } catch (RuntimeException $e) {
+                if ($attempts <= 2) {
+                    sleep(3);
+
+                    continue;
+                }
+
+                throw $e;
+            }
+
+            if ($status === 429) {
                 Cache::put(self::COOLDOWN_KEY, true, now()->addSeconds(45));
 
                 return [];
             }
 
-            throw $e;
+            if ($status < 200 || $status >= 300) {
+                throw new RuntimeException("SStats {$url} returned status {$status}");
+            }
+
+            return json_decode($body, true) ?? [];
+        }
+    }
+
+    /**
+     * Raw curl, not Laravel's HTTP client — diagnosed on prod with
+     * CURLOPT_VERBOSE: SStats negotiates HTTP/2 over TLS (ALPN), sends
+     * every header and the full response body, then never sends the frame
+     * that marks the stream finished — a server-side HTTP/2 bug. Every
+     * client that also speaks h2 hangs forever waiting for a stream end
+     * that's never coming; a plain `curl` from the same box only "worked"
+     * by accident (its ALPN negotiation didn't always land on h2).
+     * CURLOPT_SSL_ENABLE_ALPN keeps the connection on HTTP/1.1, which
+     * isn't affected — but Laravel's HTTP client refuses that option (it's
+     * outside its curl-option allow-list), so this bypasses it entirely.
+     *
+     * @return array{0: int, 1: string}
+     */
+    private function curlGet(string $url): array
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_SSL_ENABLE_ALPN => false,
+            CURLOPT_FRESH_CONNECT => true,
+            CURLOPT_FORBID_REUSE => true,
+            CURLOPT_HTTPHEADER => ['Accept: application/json'],
+        ]);
+
+        $body = curl_exec($ch);
+        $errno = curl_errno($ch);
+        $error = curl_error($ch);
+        $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+
+        if ($errno !== 0) {
+            throw new RuntimeException("SStats {$url}: curl error {$errno}: {$error}");
         }
 
-        $response->throw();
-
-        return $response->json() ?? [];
+        return [$status, (string) $body];
     }
 }
