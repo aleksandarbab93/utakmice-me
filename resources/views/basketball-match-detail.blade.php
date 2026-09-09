@@ -20,7 +20,7 @@
         </div>
 
         {{-- Score header --}}
-        <div class="bg-surface border border-white/[0.07] rounded-2xl p-5 lg:p-7 flex flex-col gap-5">
+        <div class="bg-surface border border-white/[0.07] rounded-2xl p-4 lg:p-7 flex flex-col gap-4 lg:gap-5">
             {{-- The date sits above the teams rather than between them: in
                  the middle column it forced that column wide enough to
                  squeeze the club names into two lines on a phone. --}}
@@ -30,14 +30,14 @@
                 @endif
 
                 <div class="grid items-center gap-3" style="grid-template-columns:1fr auto 1fr">
-                    <div class="flex flex-col items-center gap-2.5 text-center">
-                        <x-team-badge :initials="$match['home']['initials']" :crest="$match['home']['crest'] ?? null" class="w-14 h-14 text-base" />
-                        <span class="text-sm lg:text-[15px] font-bold">{{ $match['home']['name'] }}</span>
+                    <div class="flex flex-col items-center gap-2 text-center">
+                        <x-team-badge :initials="$match['home']['initials']" :crest="$match['home']['crest'] ?? null" class="w-11 h-11 lg:w-14 lg:h-14 text-sm lg:text-base" />
+                        <span class="text-[13px] lg:text-[15px] font-bold">{{ $match['home']['name'] }}</span>
                     </div>
 
                     <div class="flex flex-col items-center gap-1 px-1.5">
                         @if ($match['status'] === 'scheduled')
-                            <span class="font-mono text-2xl font-bold text-text-2">{{ $match['kickoff_time'] }}</span>
+                            <span class="font-mono text-xl lg:text-2xl font-bold text-text-2">{{ $match['kickoff_time'] }}</span>
                             <span class="font-mono text-[9.5px] tracking-[0.1em] text-text-dim">JOŠ NIJE POČEO</span>
                         @else
                             <span class="font-mono text-4xl lg:text-5xl font-bold {{ $match['status'] === 'live' ? 'text-live-text' : '' }}">{{ $match['home_score'] }}&nbsp;-&nbsp;{{ $match['away_score'] }}</span>
@@ -50,9 +50,9 @@
                         @endif
                     </div>
 
-                    <div class="flex flex-col items-center gap-2.5 text-center">
-                        <x-team-badge :initials="$match['away']['initials']" :crest="$match['away']['crest'] ?? null" class="w-14 h-14 text-base" />
-                        <span class="text-sm lg:text-[15px] font-bold">{{ $match['away']['name'] }}</span>
+                    <div class="flex flex-col items-center gap-2 text-center">
+                        <x-team-badge :initials="$match['away']['initials']" :crest="$match['away']['crest'] ?? null" class="w-11 h-11 lg:w-14 lg:h-14 text-sm lg:text-base" />
+                        <span class="text-[13px] lg:text-[15px] font-bold">{{ $match['away']['name'] }}</span>
                     </div>
                 </div>
             </div>
