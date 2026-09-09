@@ -9,9 +9,8 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Builds the "tok meča" (match flow) + statistics view for a single fixture
- * from SStats.net's per-match detail endpoint. Finished matches are cached
- * indefinitely (their data never changes); live matches briefly, so the
- * page stays close to real time without hammering the API on every request.
+ * from SStats.net's per-match detail payload — see payload() for where that
+ * comes from, which is a longer story than it should be.
  */
 class MatchDetail
 {
@@ -28,6 +27,8 @@ class MatchDetail
             'status' => $fixture->status,
             'statusLabel' => self::statusLabel($fixture),
             'kickoff' => $fixture->kickoff_at->local()->format('d.m.Y. H:i'),
+            'kickoff_date' => $fixture->kickoff_at->local()->format('d.m.Y.'),
+            'kickoff_time' => $fixture->kickoff_at->local()->format('H:i'),
             'home_score' => $fixture->home_score,
             'away_score' => $fixture->away_score,
             'venue' => $detail['venue']['name'] ?? $fixture->venue,

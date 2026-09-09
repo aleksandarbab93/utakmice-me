@@ -27,10 +27,11 @@
                     <span class="text-sm lg:text-[15px] font-bold">{{ $match['home']['name'] }}</span>
                 </div>
 
-                <div class="flex flex-col items-center gap-1.5 px-3">
+                <div class="flex flex-col items-center gap-1.5 px-1.5 lg:px-3">
                     @if ($match['status'] === 'scheduled')
-                        <span class="font-mono text-[11px] text-text-muted">{{ $match['kickoff'] }}</span>
-                        <span class="font-mono text-2xl font-bold text-text-dim">&ndash; : &ndash;</span>
+                        <span class="font-mono text-[10px] tracking-[0.05em] text-text-dim whitespace-nowrap">{{ $match['kickoff_date'] }}</span>
+                        <span class="font-mono text-[17px] lg:text-xl font-bold text-text-2">{{ $match['kickoff_time'] }}</span>
+                        <span class="font-mono text-xl lg:text-2xl font-bold text-text-dim">&ndash; : &ndash;</span>
                     @else
                         <span class="font-mono text-4xl lg:text-5xl font-bold {{ $match['status'] === 'live' ? 'text-live-text' : '' }}">{{ $match['home_score'] }}&nbsp;-&nbsp;{{ $match['away_score'] }}</span>
                         <span class="font-mono text-[10.5px] font-bold tracking-[0.08em] {{ $match['status'] === 'live' ? 'text-live-text' : 'text-text-muted' }} flex items-center gap-1.5">
@@ -87,7 +88,7 @@
 
         {{-- Pregled (H2H + forma) --}}
         @if (! empty($match['preview']))
-            <div class="hidden flex-col gap-4" data-match-panel="pregled">
+            <div class="hidden flex-col gap-7" data-match-panel="pregled">
                 <x-match-form-list :games="$match['preview']['h2h']" title="Posljednji međusobni duel" />
                 <x-match-form-list :games="$match['preview']['home_form']" :title="'Posljednji mečevi: '.$match['home']['name']" />
                 <x-match-form-list :games="$match['preview']['away_form']" :title="'Posljednji mečevi: '.$match['away']['name']" />

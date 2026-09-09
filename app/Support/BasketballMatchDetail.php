@@ -27,6 +27,8 @@ class BasketballMatchDetail
             'status' => $fixture->status,
             'statusLabel' => self::statusLabel($fixture),
             'kickoff' => $fixture->kickoff_at->local()->format('d.m.Y. H:i'),
+            'kickoff_date' => $fixture->kickoff_at->local()->format('d.m.Y.'),
+            'kickoff_time' => $fixture->kickoff_at->local()->format('H:i'),
             'home_score' => $fixture->home_score,
             'away_score' => $fixture->away_score,
             'venue' => $fixture->venue,
