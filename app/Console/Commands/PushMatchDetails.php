@@ -25,12 +25,17 @@ class PushMatchDetails extends Command
         {--token= : shared secret, default DETAIL_INTAKE_TOKEN}
         {--days=30 : only matches from the last N days}
         {--all    : every stored detail, however old}
-        {--chunk=25 : details per request}';
+        {--chunk=10 : details per request}';
 
     protected $description = 'Pushes locally stored match details to production';
 
     public function handle(): int
     {
+        // A single detail is tens of kilobytes of JSON and several times
+        // that once decoded into PHP arrays; a few hundred of them walk
+        // straight through the default limit even a chunk at a time.
+        ini_set('memory_limit', '512M');
+
         $url = rtrim($this->option('url') ?: (string) env('DETAIL_INTAKE_URL'), '/');
         $token = $this->option('token') ?: (string) env('DETAIL_INTAKE_TOKEN');
 
@@ -46,24 +51,34 @@ class PushMatchDetails extends Command
             $query->whereHas('fixture', fn ($q) => $q->where('kickoff_at', '>=', now()->subDays((int) $this->option('days'))));
         }
 
-        $records = $query->get()->filter(fn (MatchDetailRecord $r) => $r->fixture?->external_source === 'sstats');
+        $total = (clone $query)->count();
 
-        if ($records->isEmpty()) {
+        if ($total === 0) {
             $this->info('Nothing stored to push.');
 
             return self::SUCCESS;
         }
 
-        $this->info("Pushing {$records->count()} details to {$url}...");
+        $this->info("Pushing {$total} details to {$url}...");
 
         $stored = 0;
         $unknown = [];
+        $failed = false;
 
-        foreach ($records->chunk((int) $this->option('chunk')) as $chunk) {
-            $payload = $chunk->map(fn (MatchDetailRecord $r) => [
-                'external_id' => (string) $r->fixture->external_id,
-                'payload' => $r->payload,
-            ])->values()->all();
+        // A detail payload is tens of kilobytes and there are hundreds of
+        // them — held all at once they exhaust PHP's memory limit, so they
+        // are read a chunk at a time and released.
+        $query->chunkById((int) $this->option('chunk'), function ($chunk) use ($url, $token, &$stored, &$unknown, &$failed) {
+            $payload = $chunk
+                ->filter(fn (MatchDetailRecord $r) => $r->fixture?->external_source === 'sstats')
+                ->map(fn (MatchDetailRecord $r) => [
+                    'external_id' => (string) $r->fixture->external_id,
+                    'payload' => $r->payload,
+                ])->values()->all();
+
+            if ($payload === []) {
+                return true;
+            }
 
             $response = Http::withHeaders(['X-Detail-Token' => $token])
                 ->timeout(60)
@@ -71,13 +86,20 @@ class PushMatchDetails extends Command
 
             if ($response->failed()) {
                 $this->error('  '.$response->status().': '.$response->body());
+                $failed = true;
 
-                return self::FAILURE;
+                return false;
             }
 
             $stored += (int) $response->json('stored', 0);
             $unknown = array_merge($unknown, $response->json('unknown', []));
-            $this->line("  chunk of {$chunk->count()} sent");
+            $this->line('  sent '.count($payload));
+
+            return true;
+        });
+
+        if ($failed) {
+            return self::FAILURE;
         }
 
         $this->newLine();
