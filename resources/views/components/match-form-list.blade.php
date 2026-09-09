@@ -1,6 +1,6 @@
 @props(['games', 'title'])
 
-<div class="flex flex-col gap-2.5">
+<div class="flex flex-col gap-2">
     <span class="font-mono text-[10px] font-bold tracking-[0.14em] text-text-muted">{{ strtoupper($title) }}</span>
     <div class="bg-surface border border-white/[0.07] rounded-2xl overflow-hidden">
         @forelse ($games as $g)

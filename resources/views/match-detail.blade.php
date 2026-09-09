@@ -96,7 +96,7 @@
 
         {{-- Pregled (H2H + forma) --}}
         @if (! empty($match['preview']))
-            <div class="hidden flex-col gap-7" data-match-panel="pregled">
+            <div class="hidden flex-col gap-10" data-match-panel="pregled">
                 <x-match-form-list :games="$match['preview']['h2h']" title="Posljednji međusobni duel" />
                 <x-match-form-list :games="$match['preview']['home_form']" :title="'Posljednji mečevi: '.$match['home']['name']" />
                 <x-match-form-list :games="$match['preview']['away_form']" :title="'Posljednji mečevi: '.$match['away']['name']" />
