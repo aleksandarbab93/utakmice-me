@@ -109,6 +109,7 @@ class LeagueController extends Controller
     {
         return [
             'id' => $f->id,
+            'slug' => $f->slug,
             'home' => $f->homeTeam->name,
             'homeInitials' => TeamBadge::initials($f->homeTeam->name),
             'homeCrest' => $f->homeTeam->crest_url,

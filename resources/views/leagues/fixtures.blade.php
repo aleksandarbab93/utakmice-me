@@ -34,6 +34,7 @@
                             @php
                                 $payload = [
                                     'id' => $f->id,
+                                    'slug' => $f->slug,
                                     'home' => $f->homeTeam->name,
                                     'homeInitials' => \App\Support\TeamBadge::initials($f->homeTeam->name),
                                     'homeCrest' => $f->homeTeam->crest_url,
