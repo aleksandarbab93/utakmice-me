@@ -6,6 +6,7 @@ use App\Models\Fixture;
 use App\Models\League;
 use App\Models\Standing;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 
 /**
@@ -116,13 +117,33 @@ class FootballFeed
         ];
     }
 
-    /** Standings table for one league (by slug) — defaults to the first tracked league. */
+    /**
+     * Standings table for one league (by slug) — defaults to the first
+     * tracked league.
+     *
+     * Cached because it is the most expensive thing on the site and the
+     * least volatile: a twenty-club table asks two extra questions per row
+     * for the form guide and the next fixture, so building it costs upwards
+     * of forty queries — and every single match page renders one below the
+     * score. A table only changes when a match in that league finishes.
+     */
     public static function standings(?string $leagueSlug = null): array
     {
         $leagues = self::leagues();
         $league = ($leagueSlug ? $leagues->firstWhere('slug', $leagueSlug) : null) ?? $leagues->first();
 
+        return Cache::remember(
+            "standings:{$league->id}",
+            now()->addMinutes(5),
+            fn () => self::buildStandings($league)
+        );
+    }
+
+    /** @return array<string, mixed> */
+    private static function buildStandings(League $league): array
+    {
         $standings = Standing::where('league_id', $league->id)->with('team')->orderBy('position')->get();
+        $leagues = self::leagues();
         $zones = Accent::leagueZones($league->name);
         $relegationStart = $standings->count() - $zones['relegationCount'] + 1;
 

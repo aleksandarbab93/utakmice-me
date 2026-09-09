@@ -6,6 +6,7 @@ use App\Models\Fixture;
 use App\Models\League;
 use App\Models\Standing;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 
 /**
@@ -150,6 +151,17 @@ class BasketballFeed
         if (! $league) {
             return ['competition' => '', 'competitions' => [], 'rows' => [], 'zones' => $emptyZones, 'next' => null];
         }
+
+        return Cache::remember(
+            "standings:{$league->id}",
+            now()->addMinutes(5),
+            fn () => self::buildStandings($league, $leagues, $emptyZones)
+        );
+    }
+
+    /** @return array<string, mixed> */
+    private static function buildStandings(League $league, Collection $leagues, array $emptyZones): array
+    {
 
         $rows = Standing::where('league_id', $league->id)
             ->with('team')

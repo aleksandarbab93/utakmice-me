@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
@@ -61,3 +62,11 @@ Schedule::command('reports:regenerate --limit=50')->hourly()->withoutOverlapping
 // minutes before kickoff is no use to anybody if it's noticed six hours
 // later.
 Schedule::command('streams:sync')->everyTenMinutes()->withoutOverlapping(15);
+
+// The database cache store only deletes an expired row when that same key
+// is asked for again — and a cached page's key (generation plus URL hash)
+// is almost never asked for after its half-minute passes. Left alone the
+// table grows a row per page per visitor, for ever.
+Schedule::call(function () {
+    DB::table('cache')->where('expiration', '<', now()->subHour()->getTimestamp())->delete();
+})->name('prune-expired-cache')->dailyAt('04:50');

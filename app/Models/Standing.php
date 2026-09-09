@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\StandingObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ObservedBy(StandingObserver::class)]
 class Standing extends Model
 {
     protected $fillable = [
