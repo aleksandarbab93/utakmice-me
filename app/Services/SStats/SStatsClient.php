@@ -148,18 +148,19 @@ class SStatsClient
         try {
             $response = Http::baseUrl($this->baseUrl)
                 ->timeout(20)
-                // A fresh connection per request didn't change anything,
-                // ruling out a reused/pooled connection. The one difference
-                // left between "plain curl from this box: always fine" and
-                // "same request through Guzzle: always stalls at the same
-                // byte count" is what's on the wire — Guzzle identifies
-                // itself as "GuzzleHttp/x"; something between us and SStats
-                // (a WAF/CDN in front of it would be typical) may be
-                // shaping or silently dropping the tail of the response for
-                // that UA while leaving curl's alone.
-                ->withUserAgent('curl/8.5.0')
+                // Diagnosed on prod with CURLOPT_VERBOSE: SStats negotiates
+                // HTTP/2 over TLS (ALPN), sends every header and the full
+                // response body, then never sends the frame that marks the
+                // stream finished — a server-side HTTP/2 bug. Every client
+                // that also speaks h2 hangs forever waiting for a stream end
+                // that's never coming; a plain `curl` from the same box only
+                // "worked" by accident (its ALPN negotiation didn't always
+                // land on h2). Disabling ALPN keeps the connection on
+                // HTTP/1.1, which signals the end of a response some other
+                // way and isn't affected by this.
                 ->withOptions([
                     'curl' => [
+                        CURLOPT_SSL_ENABLE_ALPN => false,
                         CURLOPT_FRESH_CONNECT => true,
                         CURLOPT_FORBID_REUSE => true,
                     ],
