@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Fixture;
+use App\Models\MatchDetailRecord;
 use App\Services\SStats\SStatsClient;
 use Illuminate\Support\Facades\Cache;
 
@@ -54,17 +55,61 @@ class MatchDetail
             return null;
         }
 
+        return self::payload($fixture, $client);
+    }
+
+    /**
+     * The match's detail payload, from wherever it can be had.
+     *
+     * Stored first, network second — SStats refuses to finish any response
+     * past ~14.6 KB for datacenter IPs (see the match_details migration),
+     * which is most of the matches worth writing about. Whatever machine
+     * does manage a fetch writes the payload down, and from then on every
+     * other machine reads it from the database instead. A finished match's
+     * detail is final, so a stored one is never worth re-fetching.
+     *
+     * Shared with MatchReportGenerator: a report that names its scorers and
+     * a "tok meča" panel are the same data seen twice.
+     */
+    public static function payload(Fixture $fixture, SStatsClient $client): ?array
+    {
+        $stored = MatchDetailRecord::where('fixture_id', $fixture->id)->first();
+
+        if ($stored && $fixture->status === 'finished') {
+            return $stored->payload;
+        }
+
         $ttl = $fixture->status === 'finished' ? now()->addWeek() : now()->addSeconds(20);
+        $detail = null;
 
         try {
-            return Cache::remember(
+            $detail = Cache::remember(
                 "match-detail:{$fixture->external_id}",
                 $ttl,
                 fn () => $client->gameDetail((int) $fixture->external_id)
             );
         } catch (\Throwable) {
-            return null;
+            // A stalled or refused fetch is not an error here: it just means
+            // this machine can't reach that payload, and another one already
+            // has or eventually will.
         }
+
+        if ($detail) {
+            self::remember($fixture, $detail);
+
+            return $detail;
+        }
+
+        return $stored?->payload;
+    }
+
+    /** Keeps a payload we did manage to fetch, so no machine has to fetch it again. */
+    private static function remember(Fixture $fixture, array $detail): void
+    {
+        MatchDetailRecord::updateOrCreate(
+            ['fixture_id' => $fixture->id],
+            ['payload' => $detail, 'fetched_at' => now()],
+        );
     }
 
     private static function statusLabel(Fixture $fixture): string

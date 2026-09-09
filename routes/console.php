@@ -44,6 +44,18 @@ Schedule::command('basketball:sync')->dailyAt('04:30')->withoutOverlapping(180);
 Schedule::command('football:sync-live')->everyMinute()->withoutOverlapping(5);
 Schedule::command('basketball:sync-live')->everyMinute()->withoutOverlapping(5);
 
+// Match details (tok meča, statistics, and the scorers a real report is
+// written from). Hourly and small: from the server most of these stall —
+// SStats won't finish a response past ~14.6 KB for a datacenter IP — but
+// smaller leagues come through, and anything left over gets picked up by
+// running the same command from a connection that isn't subject to that.
+Schedule::command('sstats:fetch-details --limit=15 --days=7')->hourly()->withoutOverlapping(30);
+
+// Turns any report that was written without its detail into the real thing
+// as soon as that detail arrives — whether this box fetched it or it was
+// pushed here from one that could. Does nothing when there's nothing to fix.
+Schedule::command('reports:regenerate --limit=50')->hourly()->withoutOverlapping(30);
+
 // Free broadcasts (Prenosi uživo): a feed read per channel, no key, no
 // quota — cheap enough to check often, and a channel that goes live twenty
 // minutes before kickoff is no use to anybody if it's noticed six hours

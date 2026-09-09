@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Fixture extends Model
 {
@@ -44,6 +45,12 @@ class Fixture extends Model
     public function goals(): HasMany
     {
         return $this->hasMany(Goal::class);
+    }
+
+    /** The stored SStats detail payload, when some machine has managed to fetch it. */
+    public function detailRecord(): HasOne
+    {
+        return $this->hasOne(MatchDetailRecord::class);
     }
 
     public function pushSubscriptions(): BelongsToMany

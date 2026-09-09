@@ -14,8 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Plain fetch() from the service-worker push toggle doesn't carry a
         // CSRF token, and doesn't need to: these endpoints identify a
-        // browser by its push subscription, not by session.
-        $middleware->validateCsrfTokens(except: ['api/push/*']);
+        // browser by its push subscription, not by session. The match-detail
+        // intake is the same shape of thing from the other direction — another
+        // machine's artisan command, holding a shared secret, with no session
+        // to take a token from.
+        $middleware->validateCsrfTokens(except: ['api/push/*', 'api/detalji-meca']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

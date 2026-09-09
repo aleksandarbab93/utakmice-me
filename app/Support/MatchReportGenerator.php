@@ -42,12 +42,12 @@ class MatchReportGenerator
             return null;
         }
 
-        $detail = null;
-        try {
-            $detail = $client->gameDetail((int) $fixture->external_id);
-        } catch (\Throwable) {
-            // detail endpoint failing (rate limit, transient error) shouldn't block a basic report
-        }
+        // Stored first, network second — see MatchDetail::payload(). Without
+        // it the report still gets written, just as a scoreline with no
+        // scorers or narrative, which is what the generic-titled ones in the
+        // archive are; reports:regenerate replaces those once the detail
+        // exists.
+        $detail = MatchDetail::payload($fixture, $client);
 
         $variant = $fixture->id % 3;
         $goals = MatchDetail::events($detail)->filter(fn ($e) => in_array($e['icon'], ['goal', 'og'], true))->values();

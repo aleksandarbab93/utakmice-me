@@ -3,6 +3,7 @@
 use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\LeaguesController;
 use App\Http\Controllers\MatchController;
+use App\Http\Controllers\MatchDetailIntakeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\SitemapController;
@@ -91,6 +92,12 @@ Route::post('/api/push/prijava', [PushController::class, 'subscribe'])
 Route::post('/api/push/odjava', [PushController::class, 'unsubscribe'])
     ->name('push.unsubscribe')
     ->middleware('throttle:30,1');
+
+// Where `sstats:push-details`, run on a machine that can reach SStats'
+// larger responses, hands them to production, which can't.
+Route::post('/api/detalji-meca', [MatchDetailIntakeController::class, 'store'])
+    ->name('match-details.intake')
+    ->middleware('throttle:60,1');
 
 // Old URLs redirect to the new root-based scheme.
 Route::redirect('/fudbal', '/');

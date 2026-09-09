@@ -49,6 +49,13 @@ return [
         'relay_token' => env('SSTATS_RELAY_TOKEN'),
     ],
 
+    // Shared secret for POST /api/detalji-meca, where a machine that can
+    // reach SStats' larger responses hands them to production, which can't.
+    // Unset means the route doesn't exist.
+    'detail_intake' => [
+        'token' => env('DETAIL_INTAKE_TOKEN'),
+    ],
+
     'webpush' => [
         'public_key' => env('VAPID_PUBLIC_KEY'),
         'private_key' => env('VAPID_PRIVATE_KEY'),

@@ -38,6 +38,7 @@ class TransferDatabase extends Command
         'leagues',
         'teams',
         'matches',
+        'match_details',
         'standings',
         'goals',
         'posts',
