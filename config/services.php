@@ -37,7 +37,16 @@ return [
 
     'sstats' => [
         'key' => env('SSTATS_API_KEY'),
+
+        // Points straight at SStats by default. Production points it at the
+        // Cloudflare Worker in deploy/sstats-relay-worker.js instead, because
+        // that box's own network path to SStats stalls on any response past
+        // ~14.6 KB — see the worker's header comment for the full diagnosis.
         'base_url' => env('SSTATS_BASE_URL', 'https://api.sstats.net'),
+
+        // Only set when base_url is the relay: the shared secret it checks so
+        // it isn't an open proxy.
+        'relay_token' => env('SSTATS_RELAY_TOKEN'),
     ],
 
     'webpush' => [

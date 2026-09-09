@@ -11,12 +11,18 @@ use RuntimeException;
  *
  * Works anonymously with a shared rate limit; an optional free API key
  * (SSTATS_API_KEY) lifts that limit — see https://sstats.net/login.
+ *
+ * On production, baseUrl points at the Cloudflare Worker relay in
+ * deploy/sstats-relay-worker.js rather than at SStats directly — that box's
+ * network path to SStats stalls on any response past ~14.6 KB. The relay
+ * token below is what the worker checks so it isn't an open proxy.
  */
 class SStatsClient
 {
     public function __construct(
         private readonly string $baseUrl,
         private readonly ?string $apiKey,
+        private readonly ?string $relayToken = null,
     ) {
     }
 
@@ -142,6 +148,10 @@ class SStatsClient
 
         if ($this->apiKey) {
             $query['apikey'] = $this->apiKey;
+        }
+
+        if ($this->relayToken) {
+            $query['token'] = $this->relayToken;
         }
 
         $url = rtrim($this->baseUrl, '/').'/'.ltrim($path, '/');

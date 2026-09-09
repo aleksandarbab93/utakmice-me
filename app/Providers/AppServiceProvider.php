@@ -16,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(SStatsClient::class, fn () => new SStatsClient(
             baseUrl: config('services.sstats.base_url'),
             apiKey: config('services.sstats.key'),
+            relayToken: config('services.sstats.relay_token'),
         ));
     }
 
