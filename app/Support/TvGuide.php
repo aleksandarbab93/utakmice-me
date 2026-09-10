@@ -35,30 +35,32 @@ class TvGuide
     {
         $out = [];
 
-        foreach (self::channels($date) as $channel) {
-            $name = self::channelName((string) ($channel['name'] ?? ''));
+        foreach (self::pages($date) as $channels) {
+            foreach ($channels as $channel) {
+                $name = self::channelName((string) ($channel['name'] ?? ''));
 
-            if ($name === '') {
-                continue;
-            }
-
-            foreach ($channel['programs'] ?? [] as $programme) {
-                $title = trim((string) ($programme['title'] ?? ''));
-                $start = $programme['start'] ?? null;
-
-                if ($title === '' || ! $start || ! self::isMatch($title, $programme['category'] ?? null)) {
+                if ($name === '') {
                     continue;
                 }
 
-                [$home, $away] = self::teams($title);
+                foreach ($channel['programs'] ?? [] as $programme) {
+                    $title = trim((string) ($programme['title'] ?? ''));
+                    $start = $programme['start'] ?? null;
 
-                $out[] = [
-                    'channel' => $name,
-                    'title' => $title,
-                    'home' => $home,
-                    'away' => $away,
-                    'startsAt' => self::startsAt((string) $start),
-                ];
+                    if ($title === '' || ! $start || ! self::isMatch($title, $programme['category'] ?? null)) {
+                        continue;
+                    }
+
+                    [$home, $away] = self::teams($title);
+
+                    $out[] = [
+                        'channel' => $name,
+                        'title' => $title,
+                        'home' => $home,
+                        'away' => $away,
+                        'startsAt' => self::startsAt((string) $start),
+                    ];
+                }
             }
         }
 
@@ -66,21 +68,24 @@ class TvGuide
     }
 
     /**
-     * The guide, one page at a time. It pages at fifty however large a
-     * pageSize is asked for, and a day is a few hundred channels — so this
-     * is a handful of requests, run once a day under cron, never from a page.
+     * The guide, one page at a time.
      *
-     * @return array<int, array<string, mixed>>
+     * Yielded rather than collected, and this matters more than it looks: a
+     * page is fifty channels with every programme each of them shows that
+     * day, which measures about 1.8 MB — eleven of those held at once, then
+     * decoded into PHP arrays, is hundreds of megabytes to end up with the
+     * handful of football broadcasts among them. Handed over a page at a
+     * time, only one is ever in memory.
+     *
+     * @return \Generator<int, array<int, array<string, mixed>>>
      */
-    private static function channels(Carbon $date): array
+    private static function pages(Carbon $date): \Generator
     {
         $url = (string) config('services.tv_guide.url');
 
         if ($url === '') {
-            return [];
+            return;
         }
-
-        $channels = [];
 
         for ($page = 0; $page < 20; $page++) {
             try {
@@ -109,14 +114,18 @@ class TvGuide
                 break;
             }
 
-            $channels = array_merge($channels, $products);
+            $totalPages = (int) ($response->json('pagination.totalPages') ?? 0);
 
-            if ($page + 1 >= (int) ($response->json('pagination.totalPages') ?? 0)) {
+            yield $products;
+
+            // Released before the next page is asked for, so peak memory is
+            // one page rather than all of them.
+            unset($products, $response);
+
+            if ($page + 1 >= $totalPages) {
                 break;
             }
         }
-
-        return $channels;
     }
 
     /**

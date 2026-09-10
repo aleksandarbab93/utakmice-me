@@ -52,6 +52,12 @@ class SyncTvChannels extends Command
 
     public function handle(): int
     {
+        // A page of the guide is fifty channels with every programme each of
+        // them shows that day — about 1.8 MB of JSON, and several times that
+        // once decoded. One page is held at a time (see TvGuide::pages()),
+        // but that one page is still large enough to matter.
+        ini_set('memory_limit', '256M');
+
         if (! config('services.tv_guide.url')) {
             $this->info('Nema podešenog TV vodiča (TV_GUIDE_URL) — ništa se ne čita.');
 
