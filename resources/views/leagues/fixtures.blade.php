@@ -46,6 +46,7 @@
                                     'away_score' => $f->away_score,
                                     'minute' => $f->status === 'live' && $f->minute ? $f->minute."'" : null,
                                     'kickoff' => $f->kickoff_at->local()->format('H:i'),
+                                    'tv' => $f->tv_channel,
                                 ];
                             @endphp
                             <x-score-row :match="$payload" />

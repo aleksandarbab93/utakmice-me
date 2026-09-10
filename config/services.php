@@ -49,6 +49,18 @@ return [
         'relay_token' => env('SSTATS_RELAY_TOKEN'),
     ],
 
+    // Where the TV listing is read from. Empty by default on purpose: which
+    // guide a site may read, and on what terms, is a question about somebody's
+    // terms of use rather than about code. With no URL, tv:sync does nothing.
+    'tv_guide' => [
+        'url' => env('TV_GUIDE_URL'),
+        'timeout' => (int) env('TV_GUIDE_TIMEOUT', 30),
+
+        // The clock the guide keeps, whatever its timestamps claim — see
+        // TvGuide::startsAt(). Empty takes the stamps at their word.
+        'timezone' => env('TV_GUIDE_TIMEZONE', 'Europe/Belgrade'),
+    ],
+
     // Shared secret for POST /api/detalji-meca, where a machine that can
     // reach SStats' larger responses hands them to production, which can't.
     // Unset means the route doesn't exist.

@@ -31,6 +31,7 @@ class BasketballMatchDetail
             'kickoff_time' => $fixture->kickoff_at->local()->format('H:i'),
             'home_score' => $fixture->home_score,
             'away_score' => $fixture->away_score,
+            'tv' => $fixture->tv_channel,
             'venue' => $fixture->venue,
             'preview' => self::preview($fixture, $client),
             'standings' => self::standingsFor($fixture),

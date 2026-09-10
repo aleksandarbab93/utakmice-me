@@ -63,6 +63,12 @@ Schedule::command('reports:regenerate --limit=50')->hourly()->withoutOverlapping
 // later.
 Schedule::command('streams:sync')->everyTenMinutes()->withoutOverlapping(15);
 
+// Which channel carries what. After the daily fixture pull, because it can
+// only mark matches we already hold, and two days deep so tonight's card is
+// filled in well before anybody goes looking for it. Inert unless
+// TV_GUIDE_URL is set.
+Schedule::command('tv:sync --days=2')->dailyAt('05:20')->withoutOverlapping(60);
+
 // The database cache store only deletes an expired row when that same key
 // is asked for again — and a cached page's key (generation plus URL hash)
 // is almost never asked for after its half-minute passes. Left alone the

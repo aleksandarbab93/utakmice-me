@@ -57,6 +57,12 @@
                 </div>
             </div>
 
+            @if ($match['tv'] && $match['status'] === 'scheduled')
+                <div class="flex justify-center">
+                    <x-tv-chip>PRENOS &middot; {{ mb_strtoupper($match['tv']) }}</x-tv-chip>
+                </div>
+            @endif
+
             @if ($match['venue'])
                 <div class="pt-4 border-t border-white/[0.07] flex flex-wrap justify-center gap-x-4 gap-y-1 font-mono text-[10px] tracking-[0.08em] text-text-dim">
                     <span>{{ strtoupper($match['venue']) }}</span>

@@ -106,6 +106,13 @@
                                             @endif
                                         </div>
 
+                                        {{-- Only while it still helps: once a match is
+                                             over, where it was shown is no longer the
+                                             question anybody has. --}}
+                                        @if (! empty($m['tv']) && $m['status'] === 'scheduled')
+                                            <x-tv-chip class="hidden sm:inline-block flex-none">{{ $m['tv'] }}</x-tv-chip>
+                                        @endif
+
                                         @if ($m['status'] !== 'scheduled')
                                             <div class="flex-none flex flex-col gap-1.5 items-end">
                                                 <span class="font-mono text-sm font-bold {{ $scoreColor }} {{ $awayWins ? 'text-text-muted' : '' }}">{{ $m['home_score'] }}</span>

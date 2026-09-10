@@ -15,7 +15,7 @@ class Fixture extends Model
 
     protected $fillable = [
         'league_id', 'home_team_id', 'away_team_id', 'external_source', 'external_id',
-        'kickoff_at', 'status', 'home_score', 'away_score', 'minute', 'matchday', 'venue',
+        'kickoff_at', 'status', 'home_score', 'away_score', 'minute', 'matchday', 'venue', 'tv_channel',
     ];
 
     protected $casts = [
