@@ -33,6 +33,10 @@ class Accent
                 'Premijer liga', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1',
                 'Liga prvaka', 'Evropska liga', 'Liga konferencija',
                 'Superliga Srbije', 'Prva crnogorska liga', 'Premijer liga BiH', 'HNL', '1. SNL', 'Prva liga Makedonije',
+                // England's lower tiers come last: a Saturday holds three dozen
+                // of their matches, and nobody wants those above Ligue 1 or
+                // the regional leagues on the Rezultati page.
+                'Championship', 'League One', 'League Two',
             ];
     }
 
@@ -47,7 +51,7 @@ class Accent
     public static function leagueIcon(string $leagueName): array
     {
         return match ($leagueName) {
-            'Premijer liga' => ['url' => 'https://media.api-sports.io/flags/gb-eng.svg', 'type' => 'flag'],
+            'Premijer liga', 'Championship', 'League One', 'League Two' => ['url' => 'https://media.api-sports.io/flags/gb-eng.svg', 'type' => 'flag'],
             'La Liga' => ['url' => 'https://media.api-sports.io/flags/es.svg', 'type' => 'flag'],
             'Serie A' => ['url' => 'https://media.api-sports.io/flags/it.svg', 'type' => 'flag'],
             'Bundesliga' => ['url' => 'https://media.api-sports.io/flags/de.svg', 'type' => 'flag'],
@@ -74,7 +78,7 @@ class Accent
     public static function leagueCountry(string $leagueName): ?string
     {
         return match ($leagueName) {
-            'Premijer liga' => 'Engleska',
+            'Premijer liga', 'Championship', 'League One', 'League Two' => 'Engleska',
             'La Liga' => 'Španija',
             'Serie A' => 'Italija',
             'Bundesliga' => 'Njemačka',
@@ -111,6 +115,21 @@ class Accent
                 'cl' => [1, 2, 3],
                 'el' => [4],
                 'relegationCount' => 2,
+            ],
+            // In England's lower tiers the top spots mean promotion, not
+            // Europe: the first band goes up directly, the second into the
+            // play-offs. The legend reads those labels instead.
+            'Championship', 'League One' => [
+                'cl' => [1, 2],
+                'el' => [3, 4, 5, 6],
+                'relegationCount' => $leagueName === 'Championship' ? 3 : 4,
+                'labels' => ['cl' => 'Direktan plasman', 'el' => 'Plej-of za plasman'],
+            ],
+            'League Two' => [
+                'cl' => [1, 2, 3],
+                'el' => [4, 5, 6, 7],
+                'relegationCount' => 2,
+                'labels' => ['cl' => 'Direktan plasman', 'el' => 'Plej-of za plasman'],
             ],
             default => ['cl' => [], 'el' => [], 'relegationCount' => 0],
         };

@@ -86,10 +86,10 @@
     @if ($hasZones)
         <div class="px-3.5 py-2.5 border-t border-white/[0.07] flex flex-col gap-1.5 font-mono text-[9px] text-text-dim">
             @if (count($zones['cl']))
-                <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>Kvalifikacija — Liga prvaka</span>
+                <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>{{ $zones['labels']['cl'] ?? 'Kvalifikacija — Liga prvaka' }}</span>
             @endif
             @if (count($zones['el']))
-                <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-800"></span>Kvalifikacija — Evropska liga</span>
+                <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-800"></span>{{ $zones['labels']['el'] ?? 'Kvalifikacija — Evropska liga' }}</span>
             @endif
             @if ($zones['relegationCount'] > 0)
                 <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-negative"></span>Ispadanje</span>

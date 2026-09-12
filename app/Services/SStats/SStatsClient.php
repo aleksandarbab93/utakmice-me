@@ -9,13 +9,15 @@ use RuntimeException;
  * Thin wrapper around the free SStats.net football data API
  * (https://api.sstats.net, docs at https://api.sstats.net/docs).
  *
- * Works anonymously with a shared rate limit; an optional free API key
- * (SSTATS_API_KEY) lifts that limit — see https://sstats.net/login.
+ * Works anonymously with a shared rate limit (about one request every two
+ * seconds sustained, a burst of ~20, then 429s). SSTATS_API_KEY is accepted
+ * but the source doesn't actually check it.
  *
- * On production, baseUrl points at the Cloudflare Worker relay in
- * deploy/sstats-relay-worker.js rather than at SStats directly — that box's
- * network path to SStats stalls on any response past ~14.6 KB. The relay
- * token below is what the worker checks so it isn't an open proxy.
+ * From a datacenter IP the source never finishes a response past ~14.6 KB —
+ * confirmed from three unrelated networks, while a home connection gets the
+ * same 35 KB in half a second. Paging /games/list at ten rows keeps every
+ * list call under that; a single match's detail can't be paged, so those
+ * are fetched wherever they can be and stored (see match_details).
  */
 class SStatsClient
 {
@@ -140,6 +142,16 @@ class SStatsClient
      */
     private const COOLDOWN_KEY = 'sstats:cooldown';
 
+    /**
+     * Whether a recent 429 has every call returning empty for the moment.
+     * A sync that must not mistake "refused" for "nothing there" — the
+     * standings pull right after a paginated fixture walk — waits this out.
+     */
+    public static function coolingDown(): bool
+    {
+        return (bool) Cache::get(self::COOLDOWN_KEY);
+    }
+
     private function get(string $path, array $query = []): array
     {
         if (Cache::get(self::COOLDOWN_KEY)) {
@@ -191,16 +203,11 @@ class SStatsClient
     }
 
     /**
-     * Raw curl, not Laravel's HTTP client — diagnosed on prod with
-     * CURLOPT_VERBOSE: SStats negotiates HTTP/2 over TLS (ALPN), sends
-     * every header and the full response body, then never sends the frame
-     * that marks the stream finished — a server-side HTTP/2 bug. Every
-     * client that also speaks h2 hangs forever waiting for a stream end
-     * that's never coming; a plain `curl` from the same box only "worked"
-     * by accident (its ALPN negotiation didn't always land on h2).
-     * CURLOPT_SSL_ENABLE_ALPN keeps the connection on HTTP/1.1, which
-     * isn't affected — but Laravel's HTTP client refuses that option (it's
-     * outside its curl-option allow-list), so this bypasses it entirely.
+     * Raw curl rather than Laravel's HTTP client, which refuses the curl
+     * options below. Fresh connection and HTTP/1.1 per request were tried
+     * against the ~14.6 KB stall and made no difference — the ceiling is on
+     * the network path, not the protocol — but they cost nothing and keep
+     * each call independent of the last, so they stay.
      *
      * @return array{0: int, 1: string}
      */

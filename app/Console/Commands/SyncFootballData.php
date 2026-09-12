@@ -14,13 +14,17 @@ use Illuminate\Support\Str;
 
 class SyncFootballData extends Command
 {
-    protected $signature = 'football:sync';
+    protected $signature = 'football:sync
+        {--only= : comma-separated SStats league ids, instead of all of them}';
 
-    protected $description = 'Sync leagues, teams, fixtures and standings from SStats.net for the five tracked leagues';
+    protected $description = 'Sync leagues, teams, fixtures and standings from SStats.net for every tracked league';
 
     /** SStats league id => display name, matching App\Support\Accent::leagues('fudbal') */
     private const LEAGUES = [
         39 => 'Premijer liga',
+        40 => 'Championship',
+        41 => 'League One',
+        42 => 'League Two',
         140 => 'La Liga',
         135 => 'Serie A',
         78 => 'Bundesliga',
@@ -41,7 +45,10 @@ class SyncFootballData extends Command
     {
         $year = $this->currentSeasonYear();
 
-        foreach (self::LEAGUES as $externalId => $name) {
+        $only = array_filter(array_map('intval', explode(',', (string) $this->option('only'))));
+        $leagues = $only ? array_intersect_key(self::LEAGUES, array_flip($only)) : self::LEAGUES;
+
+        foreach ($leagues as $externalId => $name) {
             $this->info("Sync {$name} (#{$externalId}, season {$year})...");
 
             $league = League::updateOrCreate(
@@ -51,7 +58,17 @@ class SyncFootballData extends Command
 
             try {
                 $this->syncFixtures($client, $crestClient, $league, $externalId, $year);
-                sleep(1);
+
+                // The fixture walk above can trip the shared rate limit, which
+                // puts the client in a 45s cooldown where every call answers
+                // empty — and an empty standings answer is indistinguishable
+                // from a league with no table. Wait it out rather than record
+                // nothing.
+                while (SStatsClient::coolingDown()) {
+                    sleep(5);
+                }
+                sleep(2);
+
                 $this->call('football:sync-standings', ['--league-id' => $league->id]);
             } catch (\Throwable $e) {
                 $this->error("  {$name}: {$e->getMessage()}");
