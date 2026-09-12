@@ -67,34 +67,6 @@ class BasketballFeed
         })->filter(fn ($group) => $group['matches']->isNotEmpty())->values();
     }
 
-    /** Uživo / Danas / Sutra buckets for the home page widget. */
-    public static function homeLive(): array
-    {
-        $leagueIds = self::leagues()->pluck('id');
-        $base = Fixture::whereIn('league_id', $leagueIds)->with(['homeTeam', 'awayTeam', 'league']);
-
-        $uzivo = (clone $base)->where('status', 'live')->get();
-        $danas = (clone $base)->where('status', '!=', 'live')->whereBetween('kickoff_at', LocalDay::bounds(Carbon::today()))->orderBy('kickoff_at')->get();
-        $sutra = (clone $base)->whereBetween('kickoff_at', LocalDay::bounds(Carbon::tomorrow()))->orderBy('kickoff_at')->get();
-
-        $map = fn (Fixture $f) => [
-            'id' => $f->id,
-            'slug' => $f->slug,
-            'league' => strtoupper($f->league->name),
-            'status' => $f->status === 'live' ? 'UŽIVO' : $f->kickoff_at->local()->format('H:i'),
-            'live' => $f->status === 'live',
-            'home' => $f->homeTeam->name,
-            'away' => $f->awayTeam->name,
-            'hs' => $f->status === 'scheduled' ? '–' : (string) $f->home_score,
-            'as' => $f->status === 'scheduled' ? '–' : (string) $f->away_score,
-        ];
-
-        return [
-            'uzivo' => $uzivo->map($map)->all(),
-            'danas' => $danas->map($map)->all(),
-            'sutra' => $sutra->map($map)->all(),
-        ];
-    }
 
     /** The next calendar day (today or later) that has any fixture — used to jump straight to the season opener while nothing is on today/tomorrow. */
     public static function nextMatchDate(): ?Carbon
@@ -109,39 +81,6 @@ class BasketballFeed
         return $fixture?->kickoff_at->local()->startOfDay();
     }
 
-    /** The opening round's fixtures — a preseason stand-in for the home page's empty uživo/danas/sutra widget. */
-    public static function openingRound(): ?array
-    {
-        $date = self::nextMatchDate();
-
-        if (! $date) {
-            return null;
-        }
-
-        $leagueIds = self::leagues()->pluck('id');
-
-        $matches = Fixture::whereIn('league_id', $leagueIds)
-            ->whereBetween('kickoff_at', LocalDay::bounds($date))
-            ->with(['homeTeam', 'awayTeam', 'league'])
-            ->orderBy('kickoff_at')
-            ->get()
-            ->map(fn (Fixture $f) => [
-                'league' => strtoupper($f->league->name),
-                'status' => $f->kickoff_at->local()->format('H:i'),
-                'live' => false,
-                'home' => $f->homeTeam->name,
-                'away' => $f->awayTeam->name,
-                'hs' => '–',
-                'as' => '–',
-            ])
-            ->all();
-
-        return [
-            'date' => $date,
-            'label' => FootballFeed::DAY_ABBR[$date->isoWeekday()].' '.$date->format('d.m.'),
-            'matches' => $matches,
-        ];
-    }
 
     /** Standings table for one league (by slug) — defaults to the first tracked league. */
     public static function standings(?string $leagueSlug = null): array

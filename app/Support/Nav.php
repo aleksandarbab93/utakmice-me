@@ -9,16 +9,15 @@ namespace App\Support;
  */
 class Nav
 {
-    public static function home(string $sport, ?string $tab = null): string
+    public static function home(string $sport): string
     {
-        $url = $sport === 'kosarka' ? route('home.kosarka') : route('home.fudbal');
-
-        return $tab ? $url.'?tab='.$tab : $url;
+        return $sport === 'kosarka' ? route('home.kosarka') : route('home.fudbal');
     }
 
+    /** The day's matches are the front page, so this is home with a date on it. */
     public static function scores(string $sport, ?string $date = null): string
     {
-        $url = $sport === 'kosarka' ? route('scores.kosarka') : route('scores.fudbal');
+        $url = self::home($sport);
 
         return $date ? $url.'?date='.$date : $url;
     }

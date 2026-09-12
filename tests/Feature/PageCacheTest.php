@@ -43,13 +43,13 @@ class PageCacheTest extends TestCase
     {
         // Otherwise every shared link with a tracking parameter mints its
         // own copy of the page.
-        $this->get('/utakmice?fbclid=abc')->assertOk()->assertHeaderMissing('X-Page-Cache');
+        $this->get('/?fbclid=abc')->assertOk()->assertHeaderMissing('X-Page-Cache');
     }
 
     public function test_a_known_query_parameter_is_cached(): void
     {
-        $this->get('/utakmice?date=2026-09-06')->assertOk()->assertHeader('X-Page-Cache', 'miss');
-        $this->get('/utakmice?date=2026-09-06')->assertOk()->assertHeader('X-Page-Cache', 'hit');
+        $this->get('/?date=2026-09-06')->assertOk()->assertHeader('X-Page-Cache', 'miss');
+        $this->get('/?date=2026-09-06')->assertOk()->assertHeader('X-Page-Cache', 'hit');
     }
 
     public function test_bumping_the_generation_retires_every_stored_page(): void

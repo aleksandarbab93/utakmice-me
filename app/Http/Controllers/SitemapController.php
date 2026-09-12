@@ -23,7 +23,6 @@ class SitemapController extends Controller
 
             foreach (['fudbal', 'kosarka'] as $sport) {
                 $urls[] = ['loc' => \App\Support\Nav::home($sport), 'priority' => '1.0'];
-                $urls[] = ['loc' => \App\Support\Nav::scores($sport), 'priority' => '0.9'];
                 $urls[] = ['loc' => \App\Support\Nav::standings($sport), 'priority' => '0.6'];
             }
 

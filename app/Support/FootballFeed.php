@@ -90,34 +90,6 @@ class FootballFeed
         })->filter(fn ($group) => $group['matches']->isNotEmpty())->values();
     }
 
-    /** Uživo / Danas / Sutra buckets for the home page widget. */
-    public static function homeLive(): array
-    {
-        $leagueIds = self::leagues()->pluck('id');
-        $base = Fixture::whereIn('league_id', $leagueIds)->with(['homeTeam', 'awayTeam', 'league']);
-
-        $uzivo = (clone $base)->where('status', 'live')->get();
-        $danas = (clone $base)->where('status', '!=', 'live')->whereBetween('kickoff_at', LocalDay::bounds(Carbon::today()))->orderBy('kickoff_at')->get();
-        $sutra = (clone $base)->whereBetween('kickoff_at', LocalDay::bounds(Carbon::tomorrow()))->orderBy('kickoff_at')->get();
-
-        $map = fn (Fixture $f) => [
-            'id' => $f->id,
-            'slug' => $f->slug,
-            'league' => strtoupper($f->league->name),
-            'status' => $f->status === 'live' ? ($f->minute ? $f->minute."'" : 'UŽIVO') : $f->kickoff_at->local()->format('H:i'),
-            'live' => $f->status === 'live',
-            'home' => $f->homeTeam->name,
-            'away' => $f->awayTeam->name,
-            'hs' => $f->status === 'scheduled' ? '–' : (string) $f->home_score,
-            'as' => $f->status === 'scheduled' ? '–' : (string) $f->away_score,
-        ];
-
-        return [
-            'uzivo' => $uzivo->map($map)->all(),
-            'danas' => $danas->map($map)->all(),
-            'sutra' => $sutra->map($map)->all(),
-        ];
-    }
 
     /**
      * Standings table for one league (by slug) — defaults to the first

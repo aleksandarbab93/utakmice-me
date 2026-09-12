@@ -10,32 +10,27 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SportController;
 use App\Http\Controllers\StaticPageController;
 use App\Http\Controllers\StreamsController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])
     ->name('sitemap');
 
-// Fudbal lives at the site root — no /fudbal prefix.
-Route::get('/', [SportController::class, 'home'])
+// The day's matches ARE the front page — fudbal at the site root, no
+// /fudbal prefix. The old /utakmice address 301s here so nothing linked
+// or indexed under it goes dead.
+Route::get('/', [SportController::class, 'scores'])
     ->defaults('sport', 'fudbal')
     ->name('home.fudbal');
-
-Route::get('/utakmice', [SportController::class, 'scores'])
-    ->defaults('sport', 'fudbal')
-    ->name('scores.fudbal');
 
 Route::get('/tabele', [SportController::class, 'standings'])
     ->defaults('sport', 'fudbal')
     ->name('standings.fudbal');
 
 // Košarka keeps its /kosarka prefix.
-Route::get('/kosarka', [SportController::class, 'home'])
+Route::get('/kosarka', [SportController::class, 'scores'])
     ->defaults('sport', 'kosarka')
     ->name('home.kosarka');
-
-Route::get('/kosarka/utakmice', [SportController::class, 'scores'])
-    ->defaults('sport', 'kosarka')
-    ->name('scores.kosarka');
 
 Route::get('/kosarka/tabele', [SportController::class, 'standings'])
     ->defaults('sport', 'kosarka')
@@ -99,10 +94,19 @@ Route::post('/api/detalji-meca', [MatchDetailIntakeController::class, 'store'])
     ->name('match-details.intake')
     ->middleware('throttle:60,1');
 
-// Old URLs redirect to the new root-based scheme.
-Route::redirect('/fudbal', '/');
-Route::redirect('/fudbal/rezultati', '/utakmice');
-Route::redirect('/fudbal/tabele', '/tabele');
-Route::redirect('/rezultati', '/utakmice');
-Route::redirect('/kosarka/rezultati', '/kosarka/utakmice');
+// Old URLs redirect to the new root-based scheme. The date picker's
+// ?date= rides along, so a shared link to a particular day still lands
+// on that day.
+$toHome = fn (string $target) => fn (Request $request) => redirect()->to(
+    $target.($request->getQueryString() ? '?'.$request->getQueryString() : ''),
+    301
+);
+
+Route::get('/utakmice', $toHome('/'));
+Route::get('/kosarka/utakmice', $toHome('/kosarka'));
+Route::get('/rezultati', $toHome('/'));
+Route::get('/fudbal', $toHome('/'));
+Route::get('/fudbal/rezultati', $toHome('/'));
+Route::get('/kosarka/rezultati', $toHome('/kosarka'));
+Route::redirect('/fudbal/tabele', '/tabele', 301);
 Route::get('/vesti/{slug}', fn (string $slug) => redirect("/vijesti/{$slug}"));

@@ -11,11 +11,6 @@
             <x-logo />
         </a>
         <div class="flex items-center gap-2">
-            @if ($active === 'home')
-                <button class="w-8 h-8 rounded-full bg-surface border border-white/[0.08] flex items-center justify-center text-text-muted">
-                    <x-icon name="search" class="w-3.5 h-3.5" />
-                </button>
-            @endif
             <x-mobile-nav-drawer :sport="$sport" />
         </div>
     </div>

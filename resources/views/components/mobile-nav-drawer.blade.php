@@ -14,7 +14,6 @@
         </button>
     </div>
     <div class="flex flex-col p-2 gap-0.5">
-        <a href="{{ \App\Support\Nav::home($sport) }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text">Naslovna</a>
         <a href="{{ \App\Support\Nav::scores($sport) }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text">Utakmice</a>
         <a href="{{ \App\Support\Nav::news() }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text">Vijesti</a>
         <a href="{{ route('streams') }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text flex items-center gap-2">

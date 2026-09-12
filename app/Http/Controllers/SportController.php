@@ -5,51 +5,12 @@ namespace App\Http\Controllers;
 use App\Support\Accent;
 use App\Support\BasketballFeed;
 use App\Support\FootballFeed;
-use App\Support\PostFeed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class SportController extends Controller
 {
-    public function home(Request $request, string $sport)
-    {
-        $this->validateSport($sport);
-
-        $tab = $request->query('tab', 'uzivo');
-        if (! in_array($tab, ['uzivo', 'danas', 'sutra'], true)) {
-            $tab = 'uzivo';
-        }
-
-        $liveTabs = $sport === 'fudbal' ? FootballFeed::homeLive() : BasketballFeed::homeLive();
-        $posts = PostFeed::posts($sport)->all();
-        $hero = array_shift($posts);
-        $secondary = array_splice($posts, 0, 2);
-        $latest = collect($posts)->take(4);
-        $mostRead = collect(array_merge([$hero], $secondary))->filter()->take(3)->values();
-
-        // Basketball's new season doesn't start for a while — while uživo/danas/sutra
-        // are all empty, feature the opening round's schedule instead of nothing.
-        $openingRound = null;
-        if ($sport === 'kosarka' && empty($liveTabs['uzivo']) && empty($liveTabs['danas']) && empty($liveTabs['sutra'])) {
-            $openingRound = BasketballFeed::openingRound();
-        }
-
-        return view('home', [
-            'sport' => $sport,
-            'accent' => Accent::classes($sport),
-            'active' => 'home',
-            'tab' => $tab,
-            'liveTabs' => $liveTabs,
-            'activeMatches' => $liveTabs[$tab],
-            'openingRound' => $openingRound,
-            'hero' => $hero,
-            'secondary' => $secondary,
-            'latest' => $latest,
-            'mostRead' => $mostRead,
-        ]);
-    }
-
     public function scores(Request $request, string $sport)
     {
         $this->validateSport($sport);
@@ -80,9 +41,10 @@ class SportController extends Controller
             'dateLabel' => FootballFeed::dayLabel($date),
             'prevDate' => $date->copy()->subDay()->format('Y-m-d'),
             'nextDate' => $date->copy()->addDay()->format('Y-m-d'),
+            'title' => $this->scoresTitle($sport, $date),
             'description' => $sport === 'kosarka'
-                ? 'Rezultati košarkaških utakmica uživo — Evroliga i Evrokup. Tekući rezultati, raniji i budući mečevi.'
-                : 'Rezultati fudbalskih utakmica uživo — Premijer liga, La Liga, Serie A, Bundesliga, Ligue 1, Liga prvaka i regionalne lige. Tekući rezultati, raniji i budući mečevi.',
+                ? 'Košarkaške utakmice danas i večeras — Evroliga i Evrokup uživo. Rezultati, tabele i raspored iz Crne Gore, Srbije i regiona.'
+                : 'Fudbalske utakmice danas i večeras — rezultati uživo, TV prenosi i tabele. Liga prvaka, liga petice, Prva crnogorska liga, Superliga Srbije i regionalne lige.',
         ]);
     }
 
@@ -101,6 +63,21 @@ class SportController extends Controller
             'active' => 'standings',
             'standings' => $standings,
         ]);
+    }
+
+    /**
+     * "Utakmice danas i večeras — fudbal, rezultati uživo i TV prenosi", the
+     * way the reference site titles its front page: the phrases people
+     * actually type, in the order they type them. Another day gets that
+     * day's date instead of "danas i večeras", which would be a lie there.
+     */
+    private function scoresTitle(string $sport, Carbon $date): string
+    {
+        $when = $date->isToday() ? 'danas i večeras' : $date->format('d.m.Y.');
+
+        return $sport === 'kosarka'
+            ? "Košarka {$when} — Evroliga, rezultati uživo i TV prenosi | Utakmice.me"
+            : "Utakmice {$when} — fudbal, rezultati uživo i TV prenosi | Utakmice.me";
     }
 
     private function validateSport(string $sport): void

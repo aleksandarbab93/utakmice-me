@@ -1,4 +1,4 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Rezultati — Utakmice.me'" :description="$description">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$title" :description="$description">
     <div class="max-w-[1120px] mx-auto lg:px-7 lg:py-6">
         <div class="lg:grid lg:gap-7" style="grid-template-columns: 220px 1fr">
 
