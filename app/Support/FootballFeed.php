@@ -82,6 +82,7 @@ class FootballFeed
 
             return [
                 'name' => $league->name,
+                'label' => Accent::leagueLabel($league->name),
                 'slug' => $league->slug,
                 'flag' => Accent::leagueIcon($league->name),
                 'matches' => $matches,

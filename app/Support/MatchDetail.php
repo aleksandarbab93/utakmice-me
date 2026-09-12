@@ -20,6 +20,7 @@ class MatchDetail
 
         return [
             'league' => $fixture->league->name,
+            'league_label' => Accent::leagueLabel($fixture->league->name),
             'flag' => Accent::leagueIcon($fixture->league->name),
             'round' => $detail['game']['roundName'] ?? $fixture->matchday,
             'home' => ['name' => $fixture->homeTeam->name, 'initials' => TeamBadge::initials($fixture->homeTeam->name), 'crest' => $fixture->homeTeam->crest_url],

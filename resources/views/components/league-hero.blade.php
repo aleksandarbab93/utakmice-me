@@ -5,7 +5,7 @@
         <x-league-icon :icon="\App\Support\Accent::leagueIcon($league->name)" class="w-8 h-6" />
     </span>
     <div class="flex flex-col gap-0.5 min-w-0">
-        <h1 class="text-xl lg:text-2xl font-extrabold tracking-tight truncate">{{ $league->name }}</h1>
+        <h1 class="text-xl lg:text-2xl font-extrabold tracking-tight truncate"><span class="text-text-muted">{{ mb_strtoupper(\App\Support\Accent::leagueCountry($league->name) ?? 'Evropa', 'UTF-8') }}:</span> {{ $league->name }}</h1>
         <p class="font-mono text-[11px] tracking-[0.05em] text-text-dim">
             @if ($season)Sezona {{ $season }} &middot; @endif{{ $clubCount }} {{ \App\Support\Plural::sr($clubCount, 'klub', 'kluba', 'klubova') }}@if ($round) &middot; {{ $round }}@endif
         </p>

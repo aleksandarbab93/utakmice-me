@@ -50,7 +50,7 @@
 
                                 <div class="p-3.5 flex items-center justify-between gap-3">
                                     <div class="flex flex-col gap-1 min-w-0">
-                                        <span class="font-mono text-[9px] tracking-[0.1em] text-text-dim truncate">{{ strtoupper($fixture->league->name) }}</span>
+                                        <span class="font-mono text-[9px] tracking-[0.1em] text-text-dim truncate">{{ mb_strtoupper(\App\Support\Accent::leagueLabel($fixture->league->name), 'UTF-8') }}</span>
                                         <span class="text-[13.5px] font-semibold truncate">{{ $fixture->homeTeam->name }} — {{ $fixture->awayTeam->name }}</span>
                                     </div>
                                     <a href="{{ \App\Support\Nav::match($fixture->slug) }}" class="flex-none font-mono text-[10px] tracking-[0.05em] text-text-dim">Detalji &rsaquo;</a>

@@ -71,6 +71,17 @@ class Accent
     }
 
     /**
+     * The league as a heading: "ENGLESKA: Premijer liga", "EVROPA: Liga
+     * prvaka" — the country first, the way every listing in the region
+     * writes it, so a reader scanning a day's card finds the country before
+     * the competition. Continental competitions get "EVROPA".
+     */
+    public static function leagueLabel(string $leagueName): string
+    {
+        return mb_strtoupper(self::leagueCountry($leagueName) ?? 'Evropa', 'UTF-8').': '.$leagueName;
+    }
+
+    /**
      * The country a domestic league plays in — for grouping the /lige
      * catalog. Continental club competitions (and Evroliga/Evrokup) have
      * no single country and group under "Evropska takmičenja" instead.

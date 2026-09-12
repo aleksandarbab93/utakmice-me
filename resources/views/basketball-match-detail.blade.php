@@ -12,7 +12,7 @@
             <a href="{{ \App\Support\Nav::home('kosarka') }}" class="{{ $accent['text'] }}">KOŠARKA</a>
             <span>&rsaquo;</span>
             <x-league-icon :icon="$match['flag']" class="w-4 h-3" />
-            <span>{{ strtoupper($match['league']) }}</span>
+            <span>{{ mb_strtoupper($match['league_label'], 'UTF-8') }}</span>
             @if ($match['round'])
                 <span>&rsaquo;</span>
                 <span>{{ strtoupper($match['round']) }}</span>
