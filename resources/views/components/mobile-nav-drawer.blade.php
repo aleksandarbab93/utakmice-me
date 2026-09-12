@@ -16,10 +16,7 @@
     <div class="flex flex-col p-2 gap-0.5">
         <a href="{{ \App\Support\Nav::scores($sport) }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text">Utakmice</a>
         <a href="{{ \App\Support\Nav::news() }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text">Vijesti</a>
-        <a href="{{ route('streams') }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-live animate-live"></span>
-            Prenos uživo
-        </a>
+        <a href="{{ route('streams') }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text">Prenos uživo</a>
         <a href="{{ \App\Support\Nav::leagues() }}" class="px-3.5 py-3 rounded-lg text-[15px] font-semibold text-text">Lige</a>
 
         <button type="button" hidden data-push-toggle

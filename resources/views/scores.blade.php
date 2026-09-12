@@ -1,4 +1,7 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$title" :description="$description">
+@php
+    $liveCount = $groups->sum(fn ($group) => $group['matches']->where('status', 'live')->count());
+@endphp
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$title" :description="$description" :live-count="$liveCount">
     <div class="max-w-[1120px] mx-auto lg:px-7 lg:py-6">
         <div class="lg:grid lg:gap-7" style="grid-template-columns: 220px 1fr">
 
@@ -32,7 +35,11 @@
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                     <div class="hidden lg:flex gap-2" id="score-tabs">
                         <button data-tab="sve" data-active-class="bg-white/[0.1]" data-inactive-class="bg-surface border border-white/[0.08] text-text-muted" class="tab-btn is-active-tab h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-white/[0.1]" style="height:34px">SVE</button>
-                        <button data-tab="uzivo" data-active-class="bg-white/[0.1]" data-inactive-class="bg-surface border border-white/[0.08] text-text-muted" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">UŽIVO</button>
+                        <button data-tab="uzivo" data-active-class="bg-white/[0.1]" data-inactive-class="bg-surface border border-white/[0.08] text-text-muted" class="tab-btn h-8.5 px-4 rounded-full flex items-center gap-2 font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">
+                            <span class="w-1.5 h-1.5 rounded-full bg-live animate-live"></span>
+                            UŽIVO
+                            <span class="text-text-dim font-semibold">({{ $liveCount }})</span>
+                        </button>
                         <button data-tab="favorizovani" data-active-class="bg-white/[0.1]" data-inactive-class="bg-surface border border-white/[0.08] text-text-muted" class="tab-btn h-8.5 px-4 rounded-full flex items-center font-mono text-[10.5px] font-bold tracking-[0.1em] bg-surface border border-white/[0.08] text-text-muted" style="height:34px">FAVORIZOVANI</button>
                     </div>
                     <div class="flex items-center justify-between gap-3 w-full lg:w-auto lg:justify-start lg:gap-2">

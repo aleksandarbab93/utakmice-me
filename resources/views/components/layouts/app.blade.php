@@ -65,7 +65,7 @@
         <x-site-footer :sport="$sport" :accent="$accent" />
 
         @if ($active === 'scores')
-            <x-tab-bar :sport="$sport" :accent="$accent" />
+            <x-tab-bar :sport="$sport" :accent="$accent" :live-count="$liveCount ?? null" />
         @endif
     </div>
 </body>
