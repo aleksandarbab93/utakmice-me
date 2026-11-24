@@ -94,6 +94,7 @@ class LeagueController extends Controller
         $sport = $league->sport;
 
         $now = Carbon::now();
+        $season = $now->month >= 7 ? $now->year : $now->year - 1;
 
         return [
             'sport' => $sport,
@@ -101,7 +102,8 @@ class LeagueController extends Controller
             'active' => 'league',
             'league' => $league,
             'clubCount' => $league->teams()->count(),
-            'season' => $now->month >= 7 ? $now->year : $now->year - 1,
+            'season' => $season,
+            'seasonLabel' => $season.'/'.substr((string) ($season + 1), -2),
         ];
     }
 

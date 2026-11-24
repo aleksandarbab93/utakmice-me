@@ -1,7 +1,7 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Prenosi uživo — Utakmice.me'" description="Gdje gledati prenose fudbalskih i košarkaških utakmica uživo — provjereni izvori za mečeve danas.">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Prenosi uživo — besplatni prenosi utakmica | Utakmice.me'" description="Besplatni i zvanični prenosi fudbalskih utakmica uživo, direktno sa kanala liga i saveza — mečevi danas i narednih dana.">
     <div class="max-w-2xl mx-auto px-4 lg:px-0 py-5 lg:py-8 flex flex-col gap-5">
 
-        <div class="hidden lg:flex flex-col gap-1">
+        <div class="flex flex-col gap-1">
             <h1 class="text-2xl font-extrabold tracking-tight">Prenosi uživo</h1>
             <p class="text-sm text-text-muted">
                 @if ($liveNow)

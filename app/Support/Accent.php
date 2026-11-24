@@ -41,6 +41,20 @@ class Accent
     }
 
     /**
+     * Football leagues linked from every page. The regional ones are here
+     * because that is where the site's match-page search traffic comes from.
+     *
+     * @return list<string>
+     */
+    public static function footerLeagues(): array
+    {
+        return [
+            'Premijer liga', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1',
+            'Premijer liga BiH', 'Superliga Srbije', 'Prva crnogorska liga',
+        ];
+    }
+
+    /**
      * A real flag/badge image per league — country flags and UEFA club-
      * competition badges, off api-sports.io's free keyless media CDN (its
      * league/team ids are the same ones SStats.net uses, and country flags

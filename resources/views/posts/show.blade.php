@@ -4,7 +4,23 @@
     $author = $post['author'] ?? 'Redakcija';
 @endphp
 
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$post['title'].' — Utakmice.me'" :description="$post['lead']">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$post['title'].' — Utakmice.me'" :description="$post['lead']" :image="$post['image_url']" og-type="article">
+
+    @push('schema')
+        <script type="application/ld+json">
+        {!! json_encode(array_filter([
+            '@@context' => 'https://schema.org',
+            '@type' => 'NewsArticle',
+            'headline' => $post['title'],
+            'description' => $post['lead'],
+            'datePublished' => $post['published_at']->toAtomString(),
+            'image' => $post['image_url'] ? [url($post['image_url'])] : null,
+            'mainEntityOfPage' => url()->current(),
+            'author' => ['@type' => 'Organization', 'name' => 'Utakmice.me', 'url' => url('/')],
+            'publisher' => ['@type' => 'Organization', 'name' => 'Utakmice.me', 'url' => url('/')],
+        ]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+        </script>
+    @endpush
 
     {{-- Mobile --}}
     <div class="lg:hidden flex flex-col">

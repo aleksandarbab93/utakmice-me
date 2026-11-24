@@ -15,9 +15,11 @@ class SportController extends Controller
     {
         $this->validateSport($sport);
 
-        $date = $request->query('date')
-            ? Carbon::createFromFormat('Y-m-d', $request->query('date'))
-            : Carbon::today();
+        $date = $this->requestedDate($request) ?? Carbon::today();
+
+        // The bare address keeps one title all year round, including the days
+        // it jumps ahead to the next round; only a picked day names its date.
+        $day = $request->query('date') && ! $date->isToday() ? $date : null;
 
         $groups = $sport === 'fudbal' ? FootballFeed::matchesForDate($date) : BasketballFeed::matchesForDate($date);
 
@@ -41,7 +43,8 @@ class SportController extends Controller
             'dateLabel' => FootballFeed::dayLabel($date),
             'prevDate' => $date->copy()->subDay()->format('Y-m-d'),
             'nextDate' => $date->copy()->addDay()->format('Y-m-d'),
-            'title' => $this->scoresTitle($sport, $date),
+            'title' => $this->scoresTitle($sport, $day),
+            'heading' => $this->scoresHeading($sport, $day),
             'description' => $sport === 'kosarka'
                 ? 'Košarkaške utakmice danas i večeras — Evroliga i Evrokup uživo. Rezultati, tabele i raspored iz Crne Gore, Srbije i regiona.'
                 : 'Fudbalske utakmice danas i večeras — rezultati uživo, TV prenosi i tabele. Liga prvaka, liga petice, Prva crnogorska liga, Superliga Srbije i regionalne lige.',
@@ -65,19 +68,39 @@ class SportController extends Controller
         ]);
     }
 
-    /**
-     * "Utakmice danas i večeras — fudbal, rezultati uživo i TV prenosi", the
-     * way the reference site titles its front page: the phrases people
-     * actually type, in the order they type them. Another day gets that
-     * day's date instead of "danas i večeras", which would be a lie there.
-     */
-    private function scoresTitle(string $sport, Carbon $date): string
+    private function requestedDate(Request $request): ?Carbon
     {
-        $when = $date->isToday() ? 'danas i večeras' : $date->format('d.m.Y.');
+        $value = $request->query('date');
+
+        if (! $value) {
+            return null;
+        }
+
+        abort_unless(is_string($value) && Carbon::hasFormat($value, 'Y-m-d'), 404);
+
+        return Carbon::createFromFormat('Y-m-d', $value);
+    }
+
+    /**
+     * Search Console's top queries are "uzivo utakmice", "utakmice uzivo
+     * kosarka" and "kosarka uzivo", so "uživo" stands right next to the word
+     * it is typed with. A picked day gets its date instead of "danas i
+     * večeras", which would be a lie there.
+     */
+    private function scoresTitle(string $sport, ?Carbon $day): string
+    {
+        $when = $day ? $day->format('d.m.Y.') : 'danas i večeras';
 
         return $sport === 'kosarka'
-            ? "Košarka {$when} — Evroliga, rezultati uživo i TV prenosi | Utakmice.me"
-            : "Utakmice {$when} — fudbal, rezultati uživo i TV prenosi | Utakmice.me";
+            ? "Košarka uživo — utakmice {$when}, Evroliga i TV prenosi | Utakmice.me"
+            : "Utakmice uživo {$when} — fudbal, rezultati i TV prenosi | Utakmice.me";
+    }
+
+    private function scoresHeading(string $sport, ?Carbon $day): string
+    {
+        $heading = $sport === 'kosarka' ? 'Košarka uživo' : 'Utakmice uživo';
+
+        return $day ? $heading.' — '.$day->format('d.m.Y.') : $heading;
     }
 
     private function validateSport(string $sport): void

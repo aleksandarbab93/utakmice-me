@@ -4,7 +4,10 @@ namespace App\Support;
 
 use App\Models\Fixture;
 use App\Models\MatchDetailRecord;
+use App\Models\Team;
 use App\Services\SStats\SStatsClient;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -20,6 +23,7 @@ class MatchDetail
 
         return [
             'league' => $fixture->league->name,
+            'league_slug' => $fixture->league->slug,
             'league_label' => Accent::leagueLabel($fixture->league->name),
             'flag' => Accent::leagueIcon($fixture->league->name),
             'round' => $detail['game']['roundName'] ?? $fixture->matchday,
@@ -137,7 +141,7 @@ class MatchDetail
     }
 
     /** Normalized, chronologically sorted event list — shared with MatchReportGenerator. */
-    public static function events(?array $detail): \Illuminate\Support\Collection
+    public static function events(?array $detail): Collection
     {
         if (! $detail) {
             return collect();
@@ -261,7 +265,7 @@ class MatchDetail
                 }
 
                 return [
-                    'date' => isset($g['date']) ? \Illuminate\Support\Carbon::parse($g['date'])->format('d.m.y') : null,
+                    'date' => isset($g['date']) ? Carbon::parse($g['date'])->format('d.m.y') : null,
                     'competition' => $g['season']['league']['name'] ?? null,
                     'home' => $home,
                     'away' => $away,
@@ -281,7 +285,7 @@ class MatchDetail
         static $cache = [];
 
         if (! array_key_exists($name, $cache)) {
-            $cache[$name] = \App\Models\Team::where('name', $name)->whereNotNull('crest_url')->value('crest_url');
+            $cache[$name] = Team::where('name', $name)->whereNotNull('crest_url')->value('crest_url');
         }
 
         return $cache[$name];

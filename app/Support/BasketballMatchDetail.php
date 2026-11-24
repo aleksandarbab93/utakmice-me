@@ -20,6 +20,7 @@ class BasketballMatchDetail
     {
         return [
             'league' => $fixture->league->name,
+            'league_slug' => $fixture->league->slug,
             'league_label' => Accent::leagueLabel($fixture->league->name),
             'flag' => Accent::leagueIcon($fixture->league->name),
             'round' => $fixture->matchday,

@@ -26,7 +26,7 @@
                 <div class="flex items-start gap-2.5 lg:gap-3 mb-4 lg:mb-5">
                     <span class="flex-none w-1 h-6 lg:h-8 rounded-[2px] {{ $accent['bg'] }} mt-0.5"></span>
                     <div class="flex flex-col gap-1.5 lg:gap-2">
-                        <h1 class="text-2xl lg:text-[32px] font-extrabold tracking-tight leading-none">Utakmice</h1>
+                        <h1 class="text-2xl lg:text-[32px] font-extrabold tracking-tight leading-none">{{ $heading }}</h1>
                         <p class="text-[13.5px] lg:text-[15px] leading-relaxed text-text-muted max-w-[62ch]">{{ $description }}</p>
                     </div>
                 </div>

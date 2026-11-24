@@ -1,5 +1,7 @@
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="'Tabele — Utakmice.me'" :description="$sport === 'kosarka' ? 'Tabele Evrolige i Evrokupa — poredak, pobjede, porazi i koš razlika, ažurirano uživo.' : 'Tabele fudbalskih liga — Prva crnogorska liga, Superliga Srbije, liga petice i regionalne lige, ažurirano uživo.'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="($sport === 'kosarka' ? 'Košarka tabele — Evroliga i Evrokup' : 'Fudbal tabele — liga petice i regionalne lige').' | Utakmice.me'" :description="$sport === 'kosarka' ? 'Tabele Evrolige i Evrokupa — poredak, pobjede, porazi i koš razlika, ažurirano uživo.' : 'Tabele fudbalskih liga — Prva crnogorska liga, Superliga Srbije, liga petice i regionalne lige, ažurirano uživo.'">
     <div class="max-w-2xl mx-auto lg:py-6">
+        <h1 class="px-4 lg:px-0 pt-4 lg:pt-0 pb-1 text-2xl font-extrabold tracking-tight">{{ $sport === 'kosarka' ? 'Košarka — tabele' : 'Fudbal — tabele' }}</h1>
+
         <div class="px-4 lg:px-0 pt-3 pb-1 flex gap-2 scrollrow">
             @foreach ($standings['competitions'] as $competition)
                 <a href="{{ \App\Support\Nav::standings($sport, \Illuminate\Support\Str::slug($competition)) }}"

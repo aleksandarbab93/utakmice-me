@@ -8,9 +8,19 @@
 
         return ucfirst($weekdays[$date->isoWeekday()]).', '.$date->day.'. '.$months[$date->month].' '.$date->year.'.';
     };
+
+    $page = $fixtures->currentPage();
+    $pageTitle = $league->name.' '.$seasonLabel.' — '
+        .($tab === 'results' ? 'rezultati odigranih utakmica' : 'raspored i termini utakmica')
+        .($page > 1 ? ', strana '.$page : '')
+        .' | Utakmice.me';
+    $pageDescription = $tab === 'results'
+        ? 'Rezultati svih odigranih utakmica — '.$league->name.' '.$seasonLabel.', po kolima i datumima. Tabela i raspored narednih mečeva.'
+        : 'Raspored utakmica — '.$league->name.' '.$seasonLabel.': datumi, termini i parovi narednih kola. Tabela i rezultati odigranih mečeva.';
+    $canonical = $page > 1 ? $fixtures->url($page) : url()->current();
 @endphp
 
-<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$league->name.' — '.($tab === 'results' ? 'Rezultati' : 'Raspored').' — Utakmice.me'" :description="($tab === 'results' ? 'Rezultati odigranih utakmica — ' : 'Raspored utakmica — ').$league->name.'.'">
+<x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$pageTitle" :description="$pageDescription" :canonical="$canonical">
     <div class="max-w-[1120px] mx-auto px-4 lg:px-7 py-5 lg:py-7 flex flex-col gap-4">
         <x-league-hero :league="$league" :club-count="$clubCount" :season="$season" />
 

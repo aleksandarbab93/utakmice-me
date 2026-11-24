@@ -17,7 +17,7 @@
 
             <div class="flex flex-col gap-3">
                 <span class="font-mono text-[9.5px] font-bold tracking-[0.16em] text-text-dim">FUDBAL</span>
-                @foreach (collect(\App\Support\Accent::leagues('fudbal'))->take(5) as $league)
+                @foreach (\App\Support\Accent::footerLeagues() as $league)
                     <a href="{{ \App\Support\Nav::league(\Illuminate\Support\Str::slug($league)) }}" class="text-[13.5px] text-text-2">{{ $league }}</a>
                 @endforeach
             </div>
@@ -73,7 +73,7 @@
         <div class="grid grid-cols-2 gap-5">
             <div class="flex flex-col gap-2.5">
                 <span class="font-mono text-[9px] font-bold tracking-[0.16em] text-text-dim">FUDBAL</span>
-                @foreach (collect(\App\Support\Accent::leagues('fudbal'))->take(5) as $league)
+                @foreach (\App\Support\Accent::footerLeagues() as $league)
                     <a href="{{ \App\Support\Nav::league(\Illuminate\Support\Str::slug($league)) }}" class="text-[13px] text-text-2">{{ $league }}</a>
                 @endforeach
             </div>

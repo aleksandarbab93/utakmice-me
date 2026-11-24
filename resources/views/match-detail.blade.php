@@ -1,18 +1,24 @@
 @php
-    $matchTitle = $match['home']['name'].' — '.$match['away']['name'].' rezultat i prenos | Utakmice.me';
-    $matchDescription = $match['status'] === 'scheduled'
-        ? $match['home']['name'].' - '.$match['away']['name'].', '.$match['league'].' — termin, sastavi, tabela i najava utakmice uživo.'
-        : $match['home']['name'].' '.$match['home_score'].':'.$match['away_score'].' '.$match['away']['name'].' — '.$match['league'].', rezultat uživo i tabela.';
+    $matchTitle = \App\Support\MatchSeo::title($match);
+    $matchDescription = \App\Support\MatchSeo::description($match);
 @endphp
 <x-layouts.app :sport="$sport" :accent="$accent" :active="$active" :title="$matchTitle" :description="$matchDescription">
+    <x-breadcrumb-schema :items="[
+        'Fudbal' => \App\Support\Nav::home('fudbal'),
+        $match['league'] => \App\Support\Nav::league($match['league_slug']),
+        \App\Support\MatchSeo::heading($match) => url()->current(),
+    ]" />
+
     <div class="max-w-[720px] mx-auto px-4 lg:px-0 py-5 lg:py-8 flex flex-col gap-5">
+
+        <h1 class="sr-only">{{ \App\Support\MatchSeo::heading($match) }}</h1>
 
         {{-- Breadcrumb --}}
         <div class="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-text-dim">
             <a href="{{ \App\Support\Nav::home('fudbal') }}" class="{{ $accent['text'] }}">FUDBAL</a>
             <span>&rsaquo;</span>
             <x-league-icon :icon="$match['flag']" class="w-4 h-3" />
-            <span>{{ mb_strtoupper($match['league_label'], 'UTF-8') }}</span>
+            <a href="{{ \App\Support\Nav::league($match['league_slug']) }}">{{ mb_strtoupper($match['league_label'], 'UTF-8') }}</a>
             @if ($match['round'])
                 <span>&rsaquo;</span>
                 <span>{{ strtoupper($match['round']) }}</span>

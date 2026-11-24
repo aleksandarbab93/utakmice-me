@@ -46,7 +46,12 @@ class PostController extends Controller
             'oldestFirst' => $oldestFirst,
             'updatedLabel' => $latest ? RelativeTime::sr(Carbon::parse($latest)) : null,
             'description' => 'Najnovije vijesti iz fudbala — Premijer liga, La Liga, Serie A, Bundesliga i Liga šampiona. Rezultati i izvještaji sa utakmica, svakog dana.',
-            'canonical' => $request->fullUrl(),
+            // Only what changes which posts are listed: the sort order and
+            // any tracking parameter show the same page under another address.
+            'canonical' => route('post.index', array_filter([
+                'liga' => $leagueSlug,
+                'page' => $posts->currentPage() > 1 ? $posts->currentPage() : null,
+            ])),
         ]);
     }
 

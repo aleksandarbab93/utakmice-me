@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fixture;
 use App\Models\League;
 use App\Models\Post;
+use App\Support\Nav;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -22,8 +23,8 @@ class SitemapController extends Controller
             $urls = [];
 
             foreach (['fudbal', 'kosarka'] as $sport) {
-                $urls[] = ['loc' => \App\Support\Nav::home($sport), 'priority' => '1.0'];
-                $urls[] = ['loc' => \App\Support\Nav::standings($sport), 'priority' => '0.6'];
+                $urls[] = ['loc' => Nav::home($sport), 'priority' => '1.0'];
+                $urls[] = ['loc' => Nav::standings($sport), 'priority' => '0.6'];
             }
 
             $urls[] = ['loc' => route('post.index'), 'priority' => '0.8'];
@@ -50,14 +51,14 @@ class SitemapController extends Controller
                 });
 
             Fixture::query()
-                ->select('id', 'home_team_id', 'away_team_id', 'kickoff_at', 'status')
+                ->select('id', 'home_team_id', 'away_team_id', 'kickoff_at', 'status', 'updated_at')
                 ->with(['homeTeam:id,slug', 'awayTeam:id,slug'])
                 ->orderByDesc('kickoff_at')
                 ->get()
                 ->each(function (Fixture $fixture) use (&$urls) {
                     $urls[] = [
                         'loc' => route('match.show', $fixture->slug),
-                        'lastmod' => $fixture->kickoff_at?->toAtomString(),
+                        'lastmod' => $fixture->updated_at?->toAtomString(),
                         'priority' => $fixture->status === 'live' ? '0.9' : '0.4',
                     ];
                 });

@@ -13,19 +13,22 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="alternate icon" href="/favicon.ico">
 
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
     <meta property="og:site_name" content="Utakmice.me">
     <meta property="og:locale" content="sr_RS">
     <meta property="og:title" content="{{ $metaTitle }}">
     <meta property="og:description" content="{{ $metaDescription }}">
     <meta property="og:url" content="{{ $canonical ?? url()->current() }}">
-    <meta name="twitter:card" content="summary">
+    @if (! empty($image))
+        <meta property="og:image" content="{{ url($image) }}">
+    @endif
+    <meta name="twitter:card" content="{{ empty($image) ? 'summary' : 'summary_large_image' }}">
     <meta name="twitter:title" content="{{ $metaTitle }}">
     <meta name="twitter:description" content="{{ $metaDescription }}">
 
     <script type="application/ld+json">
     {!! json_encode([
-        '@context' => 'https://schema.org',
+        '@@context' => 'https://schema.org',
         '@type' => 'WebSite',
         'name' => 'Utakmice.me',
         'url' => url('/'),
